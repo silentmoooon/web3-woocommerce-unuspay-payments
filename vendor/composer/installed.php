@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'depay/depay-woocommerce-payments',
+        'name' => 'unuspay/unuspay-woocommerce-payments',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => '5031622050a2e43479f6cfc308445a208997dd45',
@@ -10,7 +10,7 @@
         'dev' => true,
     ),
     'versions' => array(
-        'depay/depay-woocommerce-payments' => array(
+        'unuspay/unuspay-woocommerce-payments' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => '5031622050a2e43479f6cfc308445a208997dd45',

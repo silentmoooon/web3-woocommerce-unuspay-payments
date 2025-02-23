@@ -155,7 +155,7 @@ export default function(props) {
       search: getCurrentSearch(),
     })
     currentRequest = wp.apiRequest({
-      path: `/depay/wc/transactions`,
+      path: `/unuspay/wc/transactions`,
       method: 'GET',
       data: {
         limit: getCurrentPerPage(),
@@ -217,7 +217,7 @@ export default function(props) {
                   onClick={()=>{
                     if(confirm("Are you sure you want to mark this transaction as succeeded and the order as paid?")) {
                       wp.apiRequest({
-                        path: "/depay/wc/confirm",
+                        path: "/unuspay/wc/confirm",
                         method: 'POST',
                         data: { id: transaction.id }
                       }).always(()=>window.location.reload(true))
@@ -233,7 +233,7 @@ export default function(props) {
                 onClick={()=>{
                   if(confirm("Are you sure you want to delete this transaction?")) {
                     wp.apiRequest({
-                      path: "/depay/wc/transaction",
+                      path: "/unuspay/wc/transaction",
                       method: 'DELETE',
                       data: { id: transaction.id }
                     }).always(()=>window.location.reload(true))
@@ -257,12 +257,10 @@ export default function(props) {
         settings.fetch(),
         fetchTransactionsData()
       ]).then(([settings, transactionsData])=>{
-        if(
-          !settings.depay_wc_receiving_wallet_address &&
-          !settings.depay_wc_accepted_payments &&
-          !settings.depay_wc_tokens
+        if (
+            !settings.unuspay_wc_payment_key
         ) {
-          window.location.search = '?page=wc-admin&path=%2Fdepay%2Fsettings'
+            window.location.search = "?page=wc-admin&path=%2Funuspay%2Fsettings";
         }
         setAnyTransactions(transactionsData.total > 0)
         setSummary([{ value: transactionsData.total, label: "Transactions" }])

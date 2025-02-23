@@ -1,4 +1,4 @@
-=== Web3 Cryptocurrency Payments by DePay for WooCommerce ===
+=== Web3 Cryptocurrency Payments by UnusPay for WooCommerce ===
 Contributors: depayfi
 Tags: web3, payments, woocommerce, depay, cryptocurrency
 Requires at least: 6.0
@@ -8,9 +8,9 @@ Stable tag: 2.11.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and wallets, with the DePay Payments extension for WooCommerce. MetaMask, Phantom, USDC, USDT, ETH, SOL, BSC, POL, xDAI…
+Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and wallets, with the UnusPay Payments extension for WooCommerce. MetaMask, Phantom, USDC, USDT, ETH, SOL, BSC, POL, xDAI…
 
-== Simple Web3 Cryptocurrency Payments with DePay ==
+== Simple Web3 Cryptocurrency Payments with UnusPay ==
 
 [youtube https://www.youtube.com/watch?v=j8Vx0Rrx07E]
 
@@ -33,13 +33,13 @@ Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and 
 
 == Supported Wallets ==
 
-DePay supports [most crypto wallets](https://depay.com/wallets).
+UnusPay supports [most crypto wallets](https://depay.com/wallets).
 
 == Supported Tokens ==
 
 All* standard tokens.
 
-* if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check DePay’s documentation for further details about [what tokens are supported](https://depay.com/docs/payments/supported/tokens/).
+* if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://depay.com/docs/payments/supported/tokens/).
 
 == What are the benefits for me? ==
 
@@ -53,7 +53,7 @@ All* standard tokens.
 * Peer-to-peer: Payments are made directly into your cryptocurrency wallet. No intermediary holds your funds at any time.
 * No hassle: Payments settle immediately; no fraud and no chargebacks.
 
-== Select DePay as the payment choice during checkout ==
+== Select UnusPay as the payment choice during checkout ==
 
 * Get started for free: Pay-as-you-go fees per transaction (1.5%). No monthly or setup fees.
 * Multi-Currency support: Denominate your items in 150+ supported fiat currencies.
@@ -67,7 +67,7 @@ All* standard tokens.
 == What are the benefits for my customers? ==
 
 * No gateway, no redirect: Customers make payments directly on your WooCommerce store.
-* Seamless experience: Your customers connect their wallets, and DePay automatically suggests the most cost-efficient payment.
+* Seamless experience: Your customers connect their wallets, and UnusPay automatically suggests the most cost-efficient payment.
 * Auto conversion: Your customers can use any token that exchanges with the cryptocurrencies you accept.
 
 == Mobile Web3 Payments ==

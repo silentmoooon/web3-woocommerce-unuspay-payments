@@ -1,5 +1,5 @@
 {
-    "name": "depay/depay-woocommerce-payments",
+    "name": "unuspay/unuspay-woocommerce-payments",
     "type": "project",
     "license": "MIT",
     "require": {

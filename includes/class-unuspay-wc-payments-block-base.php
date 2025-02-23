@@ -7,16 +7,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodTypeInterface;
 
-final class DePay_WC_Payments_Block_Fantom extends AbstractPaymentMethodType {
+final class UnusPay_WC_Payments_Block_Base extends AbstractPaymentMethodType {
 
 	private $gateway;
 
-	public $name = DePay_WC_Payments_Fantom_Gateway::GATEWAY_ID;
+	public $name = UnusPay_WC_Payments_Base_Gateway::GATEWAY_ID;
 
 	public function initialize() {
-		$this->gateway = new DePay_WC_Payments_Fantom_Gateway();
+		$this->gateway = new UnusPay_WC_Payments_Base_Gateway();
 		$this->settings = array(
-			'blockchains' => '["fantom"]'
+			'blockchains' => '["base"]'
 		);
 	}
 
@@ -27,14 +27,14 @@ final class DePay_WC_Payments_Block_Fantom extends AbstractPaymentMethodType {
 	public function get_payment_method_script_handles() {
 
 		wp_register_script(
-			'DEPAY_WC_BLOCKS_INTEGRATION',
-			plugins_url( 'dist/block.js', DEPAY_WC_PLUGIN_FILE ),
+			'UNUSPAY_WC_BLOCKS_INTEGRATION',
+			plugins_url( 'dist/block.js', UNUSPAY_WC_PLUGIN_FILE ),
 			array( 'wc-blocks-registry', 'wc-settings', 'wp-element' ),
-			DEPAY_CURRENT_VERSION,
+			UNUSPAY_CURRENT_VERSION,
 			true
 		);
 
-		return [ 'DEPAY_WC_BLOCKS_INTEGRATION' ];
+		return [ 'UNUSPAY_WC_BLOCKS_INTEGRATION' ];
 	}
 
 	public function get_payment_method_data() {
@@ -43,7 +43,7 @@ final class DePay_WC_Payments_Block_Fantom extends AbstractPaymentMethodType {
 			'title'       => $this->gateway->title,
 			'description' => $this->gateway->description,
 			'enabled'     => $this->gateway->is_available(),
-			'blockchains' => ['fantom'],
+			'blockchains' => ['base'],
 			'pluginUrl'   => plugin_dir_url( __FILE__ ),
 		);
 	}

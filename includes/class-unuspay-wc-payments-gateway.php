@@ -3,22 +3,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
+class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 
-	const GATEWAY_ID = 'depay_wc_payments';
+	const GATEWAY_ID = 'unuspay_wc_payments';
 
 	public $blockchain;
 
 	public function __construct() {
 		$this->id									= static::GATEWAY_ID;
-		$this->method_title				= 'DePay';
+		$this->method_title				= 'UnusPay';
 		$this->method_description = 'Web3 Payments directly into your wallet. Accept any token with on-the-fly conversion.';
 		$this->supports    				= [ 'products' ];
 		$this->init_form_fields();
 		$this->init_settings();
-		$title 										= get_option( 'depay_wc_checkout_title' );
-		$this->title  						= empty($title) ? 'DePay' : $title;
-		$description 							= get_option( 'depay_wc_checkout_description' );
+		$title 										= get_option( 'unuspay_wc_checkout_title' );
+		$this->title  						= empty($title) ? 'UnusPay' : $title;
+		$description 							= get_option( 'unuspay_wc_checkout_description' );
 		$this->description  			= empty($description) ? null : $description;
 		$this->blockchain				  = null;
 	}
@@ -29,17 +29,17 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 
 	public function get_icon() {
 		$icon = '';
-		if ( empty( get_option( 'depay_wc_blockchains' ) ) ) {
+		if ( empty( get_option( 'unuspay_wc_blockchains' ) ) ) {
 			$icon = '';
 		} else if ( null != $this->blockchain ) {
 			$url = esc_url( plugin_dir_url( __FILE__ ) . 'images/blockchains/' . $this->blockchain . '.svg' );
-			$icon = $icon . "<img title='Payments on " . ucfirst($this->blockchain) . "' class='wc-depay-blockchain-icon' src='" . $url . "'/>";
+			$icon = $icon . "<img title='Payments on " . ucfirst($this->blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
 		} else {
-			$blockchains = json_decode( get_option( 'depay_wc_blockchains' ) );
+			$blockchains = json_decode( get_option( 'unuspay_wc_blockchains' ) );
 			$index = 0;
 			foreach ( $blockchains as $blockchain ) {
 				$url = esc_url( plugin_dir_url( __FILE__ ) . 'images/blockchains/' . $blockchain . '.svg' );
-				$icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-depay-blockchain-icon' src='" . $url . "'/>";
+				$icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
 			}
 		}
 		return $icon;
@@ -58,7 +58,7 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 				'title'       => 'Title',
 				'type'        => 'text',
 				'description' => __( 'This controls the title which the user sees during checkout.' ),
-				'default'     => 'DePay',
+				'default'     => 'UnusPay',
 				'desc_tip'    => true,
 			),
 			'description' => array(
@@ -76,10 +76,10 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 
 		if ( $order->get_total() > 0 ) {
-			
+			$lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
 			$accept = $this->get_accept( $order );
 			$checkout_id = wp_generate_uuid4();
-			$result = $wpdb->insert( "{$wpdb->prefix}wc_depay_checkouts", array(
+			$result = $wpdb->insert( "{$wpdb->prefix}wc_unuspay_checkouts", array(
 				'id' => $checkout_id,
 				'order_id' => $order_id,
 				'accept' => json_encode( $accept ),
@@ -87,13 +87,13 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 			));
 			if ( false === $result ) {
 				$error_message = $wpdb->last_error;
-				DePay_WC_Payments::log( 'Storing checkout failed: ' . $error_message );
+				UnusPay_WC_Payments::log( 'Storing checkout failed: ' . $error_message );
 				throw new Exception( 'Storing checkout failed: ' . $error_message );
 			}
 			
 			return( [
 				'result'         => 'success',
-				'redirect'       => '#wc-depay-checkout-' . $checkout_id . '@' . time()
+				'redirect'       => '#wc-unuspay-checkout-' . $checkout_id . '@' . time()
 			] );
 		} else {
 			$order->payment_complete();
@@ -132,20 +132,9 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		$total = $order->get_total();
 		$currency = $order->get_currency();
 		$requests = [];
-		$token_denominated = false;
-		$token = null;
-		$api_key = get_option( 'depay_wc_api_key' );
-		if ( empty( $api_key ) ) {
-			$api_key = false;
-		}
-
-		if ( !empty( get_option( 'depay_wc_token_for_denomination' ) ) ) {
-
-			$token = json_decode( get_option( 'depay_wc_token_for_denomination' ) );
-
-			if ( $token->symbol === $currency ) {
-				$token_denominated = true;
-			}
+		$payment_key = get_option( 'unuspay_wc_payment_key' );
+		if ( empty( $payment_key ) ) {
+			$payment_key = false;
 		}
 
 		$price_decimals = get_option( 'woocommerce_price_num_decimals' );
@@ -170,10 +159,10 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 				);
 			}
 			if ( 429 === wp_remote_retrieve_response_code( $usd_amount ) ) {
-				DePay_WC_Payments::log( 'To many requests! Please upgrade to DePay PRO.' );
-				throw new Exception( 'To many requests! Please upgrade to DePay PRO.' );
+				UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
+				throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
 			} else if ( is_wp_error($usd_amount) || wp_remote_retrieve_response_code( $usd_amount ) != 200 ) {
-				DePay_WC_Payments::log( 'Price request failed!' );
+				UnusPay_WC_Payments::log( 'Price request failed!' );
 				throw new Exception( 'Price request failed!' );
 			}
 			$total_in_usd = bcmul( $usd_amount['body'], 1, 3 );
@@ -193,10 +182,10 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 				$get = wp_remote_get( sprintf( 'https://public.depay.com/currencies/%s', $currency ) );
 			}
 			if ( 429 === wp_remote_retrieve_response_code( $get ) ) {
-				DePay_WC_Payments::log( 'To many requests! Please upgrade to DePay PRO.' );
-				throw new Exception( 'To many requests! Please upgrade to DePay PRO.' );
+				UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
+				throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
 			} else if ( is_wp_error($get) || wp_remote_retrieve_response_code( $get ) != 200 ) {
-				DePay_WC_Payments::log( 'Price request failed!' );
+				UnusPay_WC_Payments::log( 'Price request failed!' );
 				throw new Exception( 'Price request failed!' );
 			}
 			$rate = $get['body'];
@@ -204,47 +193,11 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		}
 
 		if ( empty($total_in_usd) ) {
-			DePay_WC_Payments::log( 'total_in_usd empty!' );
+			UnusPay_WC_Payments::log( 'total_in_usd empty!' );
 			throw new Exception( 'total_in_usd empty!' );
 		}
 
-		$accepted_payments = json_decode( get_option( 'depay_wc_accepted_payments' ) );
 
-		if ( null != $this->blockchain ) {
-			$accepted_payments = array_values( array_filter( $accepted_payments, function ( $payment ) {
-				return $payment->blockchain === $this->blockchain;
-			}));
-		}
-
-		foreach ( $accepted_payments as $accepted_payment ) {
-			if ( $api_key ) {
-				$requests[] = array(
-					'url' => sprintf( 'https://api.depay.com/v2/conversions/%s/%s/USD?amount=' . $price_format_specifier, $accepted_payment->blockchain, $accepted_payment->token, $total_in_usd ),
-					'type' => 'GET',
-					'timeout' => 10,
-					'headers' => array(
-						'x-api-key' => $api_key
-					)
-				);
-				$requests[] = array(
-					'url' => sprintf( 'https://api.depay.com/v2/tokens/decimals/%s/%s', $accepted_payment->blockchain, $accepted_payment->token ),
-					'type' => 'GET',
-					'headers' => array(
-						'x-api-key' => $api_key
-					)
-				);
-			} else {
-				$requests[] = array(
-					'url' => sprintf( 'https://public.depay.com/conversions/%s/%s/USD?amount=' . $price_format_specifier, $accepted_payment->blockchain, $accepted_payment->token, $total_in_usd ),
-					'type' => 'GET',
-					'timeout' => 10
-				);
-				$requests[] = array(
-					'url' => sprintf( 'https://public.depay.com/tokens/decimals/%s/%s', $accepted_payment->blockchain, $accepted_payment->token ),
-					'type' => 'GET'
-				);
-			}
-		}
 
 		$responses = Requests::request_multiple( $requests );
 
@@ -253,8 +206,8 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		for ($i = 0; $i < count($responses); $i++) {
 			if ( 0 === $i % 2 ) { // even 0, 2, 4 ...
 				if ( 429 === $responses[$i]->status_code ) {
-					DePay_WC_Payments::log( 'To many requests! Please upgrade to DePay PRO.' );
-					throw new Exception( 'To many requests! Please upgrade to DePay PRO.' );
+					UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
+					throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
 				} else if ( $responses[$i]->success && $responses[$i+1]->success && !empty( $responses[$i]->body ) && !empty( $responses[$i+1]->body ) ) {
 					$accepted_payment = $accepted_payments[ $i / 2 ];
 					if ( $token_denominated && $token && $token->blockchain === $accepted_payment->blockchain && $token->address === $accepted_payment->token ) {
@@ -270,16 +223,16 @@ class DePay_WC_Payments_Gateway extends WC_Payment_Gateway {
 							'receiver' => $accepted_payment->receiver
 						]);
 					} else {
-						DePay_WC_Payments::log( 'Amount is empty: ' . $requests[$i]['url'] );
+						UnusPay_WC_Payments::log( 'Amount is empty: ' . $requests[$i]['url'] );
 					}
 				} else {
-					DePay_WC_Payments::log( 'Accept request failed: ' . $responses[$i]->status_code . ' ' . $requests[$i]['url'] );
+					UnusPay_WC_Payments::log( 'Accept request failed: ' . $responses[$i]->status_code . ' ' . $requests[$i]['url'] );
 				}
 			}
 		}
 		
 		if ( empty( $accept ) ) {
-			DePay_WC_Payments::log( 'No valid payment route found!' );
+			UnusPay_WC_Payments::log( 'No valid payment route found!' );
 			throw new Exception( 'No valid payment route found!' );
 		}
 

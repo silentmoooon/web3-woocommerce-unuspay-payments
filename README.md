@@ -1,8 +1,8 @@
-## DePay Payments for WooCommerce
+## UnusPay Payments for WooCommerce
 
 ![Web3 Payments for WooCommerce](/.wordpress-org/screenshot-2.gif)
 
-Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and wallets, with the DePay Payments extension for WooCommerce. MetaMask, Phantom, USDC, USDT, ETH, SOL, BSC, POL, xDAI…
+Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and wallets, with the UnusPay Payments extension for WooCommerce. MetaMask, Phantom, USDC, USDT, ETH, SOL, BSC, POL, xDAI…
 
 ### Demo
 
@@ -33,5 +33,5 @@ cd lint && composer install && cd ..
 Then run:
 
 ```
-php ./lint/vendor/bin/phpcs --standard=./lint/pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --ignore-annotations --extensions=php,html depay-woocommerce-payments.php includes
+php ./lint/vendor/bin/phpcs --standard=./lint/pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --ignore-annotations --extensions=php,html unuspay-woocommerce-payments.php includes
 ```
