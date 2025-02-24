@@ -129,117 +129,49 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 	}
 
 	public function getUnuspayOrder( $order ) {
+	$lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
+	$headers = array(
+    				'accept-language' => $lang,
+    				'Content-Type' => 'application/json; charset=utf-8',
+    			);
 	    $website=get_option("website");
-        $lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
+
 		$total = $order->get_total();
 		$currency = $order->get_currency();
-		$requests = [];
+
 		$payment_key = get_option( 'unuspay_wc_payment_key' );
 		if ( empty( $payment_key ) ) {
 			throw new Exception( 'No payment key found!' );
 		}
 
+        $post = wp_remote_post( "http://110.41.71.103:9080/payment/ecommerce/order",
+        			array(
+        				'headers' => $headers,
+        				'body' => json_encode([
+        					'website' => $website,
+        					'lang' => $lang,
+        					'orderNo' => $order->get_id(),
+        					'payLinkId' => $payment_key,
+        					'currency' => $currency,
+        					'amount' => $order->get_total()
+        				]),
+        				'method' => 'POST',
+        				'data_format' => 'body'
+        			)
+        		);
+        $post_response_code = $post_response['response']['code'];
+        		$post_response_successful = ! is_wp_error( $post_response_code ) && $post_response_code >= 200 && $post_response_code < 300;
+        		if(!$post_response_successful){
+        		    UnusPay_WC_Payments::log( 'ecommerce order failed!' . $post_response->get_error_message() );
+                	throw new Exception( 'request failed!' );
+        		}
+        		$post_response_json = json_decode( $post_response['body']);
+        		if($post_response_json->code!=200){
+        		    UnusPay_WC_Payments::log( 'ecommerce order failed!' . $post_response_json->message() );
+                    throw new Exception( 'request failed!' );
+        		}
 
-		$price_decimals = get_option( 'woocommerce_price_num_decimals' );
-		$price_format_specifier = '%.' . $price_decimals . 'f';
-		if ( $token_denominated ) {
-			if ( $api_key ) {
-				$usd_amount = wp_remote_get(
-					sprintf( 'https://api.depay.com/v2/conversions/USD/%s/%s?amount=' . $price_format_specifier, $token->blockchain, $token->address, $total ),
-					array(
-						'headers' => array(
-							'x-api-key' => $api_key
-						),
-						'timeout' => 10
-					)
-				);
-			} else {
-				$usd_amount = wp_remote_get(
-					sprintf( 'https://public.depay.com/conversions/USD/%s/%s?amount=' . $price_format_specifier, $token->blockchain, $token->address, $total ),
-					array(
-						'timeout' => 10
-					)
-				);
-			}
-			if ( 429 === wp_remote_retrieve_response_code( $usd_amount ) ) {
-				UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
-				throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
-			} else if ( is_wp_error($usd_amount) || wp_remote_retrieve_response_code( $usd_amount ) != 200 ) {
-				UnusPay_WC_Payments::log( 'Price request failed!' );
-				throw new Exception( 'Price request failed!' );
-			}
-			$total_in_usd = bcmul( $usd_amount['body'], 1, 3 );
-		} else if ( 'USD' == $currency ) {
-			$total_in_usd = $total;
-		} else {
-			if ( $api_key ) {
-				$get = wp_remote_get(
-					sprintf( 'https://api.depay.com/v2/currencies/%s', $currency ),
-					array(
-						'headers' => array(
-							'x-api-key' => $api_key
-						)
-					)
-				);
-			} else {
-				$get = wp_remote_get( sprintf( 'https://public.depay.com/currencies/%s', $currency ) );
-			}
-			if ( 429 === wp_remote_retrieve_response_code( $get ) ) {
-				UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
-				throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
-			} else if ( is_wp_error($get) || wp_remote_retrieve_response_code( $get ) != 200 ) {
-				UnusPay_WC_Payments::log( 'Price request failed!' );
-				throw new Exception( 'Price request failed!' );
-			}
-			$rate = $get['body'];
-			$total_in_usd = bcdiv( $total, $rate, 3 );
-		}
-
-		if ( empty($total_in_usd) ) {
-			UnusPay_WC_Payments::log( 'total_in_usd empty!' );
-			throw new Exception( 'total_in_usd empty!' );
-		}
-
-
-
-		$responses = Requests::request_multiple( $requests );
-
-		$accept = [];
-
-		for ($i = 0; $i < count($responses); $i++) {
-			if ( 0 === $i % 2 ) { // even 0, 2, 4 ...
-				if ( 429 === $responses[$i]->status_code ) {
-					UnusPay_WC_Payments::log( 'To many requests! Please upgrade to UnusPay PRO.' );
-					throw new Exception( 'To many requests! Please upgrade to UnusPay PRO.' );
-				} else if ( $responses[$i]->success && $responses[$i+1]->success && !empty( $responses[$i]->body ) && !empty( $responses[$i+1]->body ) ) {
-					$accepted_payment = $accepted_payments[ $i / 2 ];
-					if ( $token_denominated && $token && $token->blockchain === $accepted_payment->blockchain && $token->address === $accepted_payment->token ) {
-						$amount = $total;
-					} else {
-						$amount = $this->round_token_amount( $responses[$i]->body );
-					}
-					if ( !empty( $amount ) && strval( $amount ) !== '0.00' ) {
-						array_push($accept, [
-							'blockchain' => $accepted_payment->blockchain,
-							'token' => $accepted_payment->token,
-							'amount' => $amount,
-							'receiver' => $accepted_payment->receiver
-						]);
-					} else {
-						UnusPay_WC_Payments::log( 'Amount is empty: ' . $requests[$i]['url'] );
-					}
-				} else {
-					UnusPay_WC_Payments::log( 'Accept request failed: ' . $responses[$i]->status_code . ' ' . $requests[$i]['url'] );
-				}
-			}
-		}
-		
-		if ( empty( $accept ) ) {
-			UnusPay_WC_Payments::log( 'No valid payment route found!' );
-			throw new Exception( 'No valid payment route found!' );
-		}
-
-		return $accept;
+		        return $post_response_json;
 	}
 
 	public function admin_options() {
