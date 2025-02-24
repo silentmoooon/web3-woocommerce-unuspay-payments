@@ -76,8 +76,8 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 
 		if ( $order->get_total() > 0 ) {
-			$lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
-			$accept = $this->get_accept( $order );
+
+			$accept = $this->getUnuspayOrder( $order );
 			$checkout_id = wp_generate_uuid4();
 			$result = $wpdb->insert( "{$wpdb->prefix}wc_unuspay_checkouts", array(
 				'id' => $checkout_id,
@@ -128,14 +128,17 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		}
 	}
 
-	public function get_accept( $order ) {
+	public function getUnuspayOrder( $order ) {
+	    $website=get_option("website");
+        $lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
 		$total = $order->get_total();
 		$currency = $order->get_currency();
 		$requests = [];
 		$payment_key = get_option( 'unuspay_wc_payment_key' );
 		if ( empty( $payment_key ) ) {
-			$payment_key = false;
+			throw new Exception( 'No payment key found!' );
 		}
+
 
 		$price_decimals = get_option( 'woocommerce_price_num_decimals' );
 		$price_format_specifier = '%.' . $price_decimals . 'f';
