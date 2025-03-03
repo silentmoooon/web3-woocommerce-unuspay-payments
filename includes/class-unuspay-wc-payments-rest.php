@@ -81,7 +81,7 @@ class UnusPay_WC_Payments_Rest {
 			[
 				'methods' => 'GET',
 				'callback' => [ $this, 'debug' ],
-				'permission_callback' => '__return_true'
+				'permission_callback' => array( $this, 'must_be_signed_by_remote' )
 			]
 		);
 	}
@@ -209,7 +209,7 @@ class UnusPay_WC_Payments_Rest {
 			}
 		}
 		
-		if ( $total_in_usd < 1000 ) {
+		if ( $total_in_usd < 100 ) {
 			$required_commitment = 'confirmed';
 		} else {
 			$required_commitment = 'finalized';
@@ -293,11 +293,13 @@ class UnusPay_WC_Payments_Rest {
 			$headers = array( 
 				'x-api-key' => $api_key,
 				'Content-Type' => 'application/json; charset=utf-8',
+				'Origin' => get_site_url(),
 			);
 		} else {
 			$endpoint = 'https://public.depay.com/payments';
 			$headers = array(
-				'Content-Type' => 'application/json; charset=utf-8'
+				'Content-Type' => 'application/json; charset=utf-8',
+                'Origin' => get_site_url(),
 			);
 		}
 
@@ -628,6 +630,18 @@ class UnusPay_WC_Payments_Rest {
 
 		$response->set_status( 200 );
 		return $response;
+	}
+
+public function must_be_signed_by_remote( $request ) {
+		if ( !$request->get_param('challenge') || !$request->get_param('signature') ) {
+			return false;
+		} else {
+			$key = PublicKeyLoader::load( self::$key )->withHash( 'sha256' )->withPadding( RSA::SIGNATURE_PSS )->withMGFHash( 'sha256' )->withSaltLength( 64 );
+			$signature = $request->get_param('signature');
+			$signature = str_replace( '_', '/', $signature );
+			$signature = str_replace( '-', '+', $signature );
+			return $key->verify( $request->get_param('challenge'), base64_decode( $signature ) );
+		}
 	}
 
 	public function must_be_wc_admin( $request ) {

@@ -45,13 +45,32 @@ function unuspay_run_migration() {
 			created_at datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
 			PRIMARY KEY  (id)
 		);
-
+        CREATE TABLE {$wpdb->prefix}wc_unuspay_transactions (
+        			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        			order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
+        			checkout_id VARCHAR(36) NOT NULL,
+        			tracking_uuid TINYTEXT NOT NULL,
+        			blockchain TINYTEXT NOT NULL,
+        			transaction_id TINYTEXT NOT NULL,
+        			sender_id TINYTEXT NOT NULL,
+        			receiver_id TINYTEXT NOT NULL,
+        			token_id TINYTEXT NOT NULL,
+        			amount TINYTEXT NOT NULL,
+        			status TINYTEXT NOT NULL,
+        			failed_reason TINYTEXT NOT NULL,
+        			commitment_required TINYTEXT NOT NULL,
+        			confirmed_by TINYTEXT NOT NULL,
+        			confirmed_at datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+        			created_at datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+        			PRIMARY KEY  (id),
+        			KEY tracking_uuid_index (tracking_uuid(191))
+        		);
 	");
 
-/* 	$exists = $wpdb->get_col("SHOW COLUMNS FROM wp_wc_unuspay_transactions LIKE 'confirmations_required'");
+  	$exists = $wpdb->get_col("SHOW COLUMNS FROM wp_wc_unuspay_transactions LIKE 'confirmations_required'");
 	if (! empty( $exists ) ) {
 		$wpdb->query( 'ALTER TABLE wp_wc_unuspay_transactions DROP COLUMN confirmations_required' );
-	} */
+	}
 
 	if ( 'wp_' != $wpdb->prefix ) {
 		
@@ -66,9 +85,9 @@ function unuspay_run_migration() {
 		}
 
 		// Rename wp_wc_unuspay_transactions to prefix_wc_unuspay_transactions if it exists
-		/* if ($wpdb->get_var( $wpdb->prepare('SHOW TABLES LIKE %s', 'wp_wc_unuspay_transactions') ) == 'wp_wc_unuspay_transactions') {
+		  if ($wpdb->get_var( $wpdb->prepare('SHOW TABLES LIKE %s', 'wp_wc_unuspay_transactions') ) == 'wp_wc_unuspay_transactions') {
 				$wpdb->query( $wpdb->prepare('RENAME TABLE %s TO %s', 'wp_wc_unuspay_transactions', $wpdb->prefix . 'wc_unuspay_transactions') );
-		} */
+		}
 	}
 
 	// Update latest DB version last
