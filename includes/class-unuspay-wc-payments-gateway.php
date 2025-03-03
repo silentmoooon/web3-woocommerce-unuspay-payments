@@ -76,9 +76,10 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		$order = wc_get_order( $order_id );
 
 		if ( $order->get_total() > 0 ) {
+             
+            $checkout_id = wp_generate_uuid4();
+			$accept = $this->getUnusPayOrder( $order ,$checkout_id);
 
-			$accept = $this->getUnuspayOrder( $order );
-			$checkout_id = wp_generate_uuid4();
 			$result = $wpdb->insert( "{$wpdb->prefix}wc_unuspay_checkouts", array(
 				'id' => $checkout_id,
 				'order_id' => $order_id,
@@ -90,11 +91,11 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 				UnusPay_WC_Payments::log( 'Storing checkout failed: ' . $error_message );
 				throw new Exception( 'Storing checkout failed: ' . $error_message );
 			}
-			
 			return( [
-				'result'         => 'success',
-				'redirect'       => '#wc-unuspay-checkout-' . $checkout_id . '@' . time()
-			] );
+            				'result'         => 'success',
+            				'redirect'       => '#wc-unuspay-checkout-' . $checkout_id . '@' . time()
+            				// 'redirect'       => get_option('woocommerce_enable_signup_and_login_from_checkout') === 'yes' ? $order->get_checkout_payment_url() . '#wc-depay-checkout-' . $checkout_id . '@' . time() : '#wc-depay-checkout-' . $checkout_id . '@' . time()
+            			] );
 		} else {
 			$order->payment_complete();
 		}
@@ -128,7 +129,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 		}
 	}
 
-	public function getUnuspayOrder( $order ) {
+	public function getUnusPayOrder( $order ,$checkout_id ) {
 	$lang=$_SERVER['HTTP_ACCEPT_LANGUAGE'];
 	$headers = array(
     				'accept-language' => $lang,
@@ -148,9 +149,11 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
         			array(
         				'headers' => $headers,
         				'body' => json_encode([
+        				    'checkout_id' => $checkout_id,
         					'website' => $website,
         					'lang' => $lang,
         					'orderNo' => $order->get_id(),
+                            'email' => $order->get_billing_email(),
         					'payLinkId' => $payment_key,
         					'currency' => $currency,
         					'amount' => $order->get_total()

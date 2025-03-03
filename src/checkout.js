@@ -52,16 +52,21 @@ const displayCheckout = async () => {
             window.location = response.redirect;
             return;
         }
+        const paymentInfo = [];
+        response.tokens.forEach((token) => {
+            paymentInfo.push({
+                blockchain: token.blockchain,
+                amount: token.amount,
+                token: token.tokenAddress,
+                receiver: token.receiveAddress,
+                fee: {
+                    amount: token.feeRate + "%",
+                    receiver: token.feeAddress,
+                },
+            });
+        });
         let configuration = {
-            accept: response.map((_accept) => {
-                return {
-                    ..._accept,
-                    fee: {
-                        amount: "1.5%",
-                        receiver: feeReceivers[_accept.blockchain],
-                    },
-                };
-            }),
+            accept: paymentInfo,
             closed: () => {
                 window.location.hash = "";
                 window.location.reload(true);
