@@ -133,10 +133,7 @@ class UnusPay_WC_Payments_Rest {
 	public function track_payment( $request ) {
 
 		global $wpdb;
-		$api_key = get_option( 'unuspay_wc_api_key' );
-		if ( empty( $api_key ) ) {
-			$api_key = false;
-		}
+        $jsonBody=$request->get_json_params();
 		$id = $request->get_param( 'id' );
 		$accept = $wpdb->get_var(
 			$wpdb->prepare(
@@ -151,69 +148,10 @@ class UnusPay_WC_Payments_Rest {
 			)
 		);
 		$order = wc_get_order( $order_id );
-		$accepted_payment = null;
-		foreach ( json_decode( $accept ) as $accepted ) {
-			if (
-				$accepted->blockchain === $request->get_param( 'blockchain' ) &&
-				$accepted->token === $request->get_param( 'to_token' )
-			) {
-				$accepted_payment = $accepted;
-			}
-		}
 
-		if ( $api_key ) {
-			$get = wp_remote_get(
-				sprintf( 'https://api.depay.com/v2/tokens/decimals/%s/%s', $accepted_payment->blockchain, $accepted_payment->token ),
-				array(
-					'headers' => array(
-						'x-api-key' => $api_key
-					)
-				)
-			);
-		} else {
-			$get = wp_remote_get( sprintf( 'https://public.depay.com/tokens/decimals/%s/%s', $accepted_payment->blockchain, $accepted_payment->token ) );
-		}
-		$decimals = intval($get['body']);
-
-		$fee_amount = bcmul( $accepted_payment->amount, '0.015', $decimals );
-		$amount = bcsub( $accepted_payment->amount, $fee_amount, $decimals );
 		$tracking_uuid = wp_generate_uuid4();
 
 		$total = $order->get_total();
-		$currency = $order->get_currency();
-		$total_in_usd = 0;
-		if ( 'USD' === $currency ) {
-			$total_in_usd = $total;
-		} else {
-			if ( get_option( 'unuspay_wc_token_for_denomination' ) ) {
-				$token = json_decode( get_option( 'unuspay_wc_token_for_denomination' ) );
-			}
-
-			if ( !empty($token) && $token->symbol ===  $currency ) {
-				$total_in_usd = 0;
-			} else {
-				if ( $api_key ) {
-					$get = wp_remote_get(
-						sprintf( 'https://api.depay.com/v2/currencies/%s', $currency ),
-						array(
-							'headers' => array(
-								'x-api-key' => $api_key
-							)
-						)
-					);
-				} else {
-					$get = wp_remote_get( sprintf( 'https://public.depay.com/currencies/%s', $currency ) );
-				}
-				$rate = $get['body'];
-				$total_in_usd = bcdiv( $total, $rate, 3 );
-			}
-		}
-		
-		if ( $total_in_usd < 100 ) {
-			$required_commitment = 'confirmed';
-		} else {
-			$required_commitment = 'finalized';
-		}
 
 		$transaction_id = $request->get_param( 'transaction' );
 
@@ -224,23 +162,6 @@ class UnusPay_WC_Payments_Rest {
 				throw new Exception( 'Order has been completed already!' );
 			}
 
-			$result = $wpdb->insert( "{$wpdb->prefix}wc_unuspay_transactions", array(
-				'order_id' => $order_id,
-				'checkout_id' => $id,
-				'tracking_uuid' => $tracking_uuid,
-				'blockchain' => $accepted_payment->blockchain,
-				'sender_id' => $request->get_param( 'sender' ),
-				'receiver_id' => $accepted_payment->receiver,
-				'token_id' => $accepted_payment->token,
-				'amount' => $amount,
-				'status' => 'PENDING',
-				'commitment_required' => $required_commitment,
-				'created_at' => current_time( 'mysql' )
-			) );
-			if ( false === $result ) {
-				UnusPay_WC_Payments::log( 'Storing trace failed!' );
-				throw new Exception( 'Storing trace failed!!' );
-			}
 			
 		} else { // PAYMENT TRACKING
 
@@ -248,14 +169,14 @@ class UnusPay_WC_Payments_Rest {
 				'order_id' => $order_id,
 				'checkout_id' => $id,
 				'tracking_uuid' => $tracking_uuid,
-				'blockchain' => $accepted_payment->blockchain,
+				'blockchain' => $request->get_param('blockchain'),
 				'transaction_id' => $transaction_id,
 				'sender_id' => $request->get_param( 'sender' ),
-				'receiver_id' => $accepted_payment->receiver,
-				'token_id' => $accepted_payment->token,
-				'amount' => $amount,
+				'receiver_id' => '',
+				'token_id' => '',
+				'amount' => 0.00,
 				'status' => 'VALIDATING',
-				'commitment_required' => $required_commitment,
+
 				'created_at' => current_time( 'mysql' )
 			) );
 			if ( false === $result ) {
@@ -265,70 +186,13 @@ class UnusPay_WC_Payments_Rest {
 
 		}
 
-		$fee_receivers = [
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'ethereum' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'bsc' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'polygon' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'solana' => '5hqJfrh7SrokFqj16anNqACyUv1PCg7oEqi7oUya1kMQ',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'fantom' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'gnosis' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'avalanche' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'arbitrum' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'optimism' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb',
-				// phpcs:ignore PHPCompatibility.Miscellaneous.ValidIntegers.HexNumericStringFound
-				'base' => '0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb'
-		];
+		$endpoint = 'http://127.0.0.1:8080/payment/pay';
 
-		if ( $api_key ) {
-			$endpoint = 'https://api.depay.com/v2/payments';
-			$headers = array( 
-				'x-api-key' => $api_key,
-				'Content-Type' => 'application/json; charset=utf-8',
-				'Origin' => get_site_url(),
-			);
-		} else {
-			$endpoint = 'https://public.depay.com/payments';
-			$headers = array(
-				'Content-Type' => 'application/json; charset=utf-8',
-                'Origin' => get_site_url(),
-			);
-		}
-
+        $jsonBody->callback =  get_site_url( null, 'index.php?rest_route=/unuspay/wc/validate' );
 		$post = wp_remote_post( $endpoint,
 			array(
 				'headers' => $headers,
-				'body' => json_encode([
-					'blockchain' => $accepted_payment->blockchain,
-					'receiver' => $accepted_payment->receiver,
-					'token' => $accepted_payment->token,
-					'amount' => $amount,
-					'commitment' => $required_commitment,
-					'transaction' => $transaction_id,
-					'sender' => $request->get_param( 'sender' ),
-					'nonce' => $request->get_param( 'nonce' ),
-					'after_block' => $request->get_param( 'after_block' ),
-					'uuid' => $tracking_uuid,
-					'callback' => get_site_url( null, 'index.php?rest_route=/unuspay/wc/validate' ),
-					'payload' => [
-						'merchant_name' => get_option( 'blogname' ),
-						'merchant_country' => preg_replace('/\:\w*/', '', get_option( 'woocommerce_default_country' ) )
-					],
-					'forward_to' => $order->get_checkout_order_received_url(),
-					'forward_on_failure' => false,
-					'fee_amount' => $fee_amount,
-					'fee_receiver' => $fee_receivers[$accepted_payment->blockchain],
-					'deadline' => $request->get_param( 'deadline' ),
-					'selected_wallet' => $request->get_param( 'selected_wallet' )
-				]),
+				'body' => json_encode($jsonBody),
 				'method' => 'POST',
 				'data_format' => 'body'
 			)
