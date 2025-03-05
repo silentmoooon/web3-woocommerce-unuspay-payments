@@ -48,7 +48,7 @@ class UnusPay_WC_Payments_Rest {
 				'permission_callback' => '__return_true'
 			]
 		);
-		register_rest_route(
+		/* register_rest_route(
 			'unuspay/wc',
 			'/transactions',
 			[
@@ -65,8 +65,8 @@ class UnusPay_WC_Payments_Rest {
 				'callback' => [ $this, 'delete_transaction' ],
 				'permission_callback' => array( $this, 'must_be_wc_admin' ) 
 			]
-		);
-		register_rest_route(
+		); */
+		/* register_rest_route(
 			'unuspay/wc',
 			'/confirm',
 			[
@@ -74,8 +74,8 @@ class UnusPay_WC_Payments_Rest {
 				'callback' => [ $this, 'confirm_payment' ],
 				'permission_callback' => array( $this, 'must_be_wc_admin' )
 			]
-		);
-		register_rest_route(
+		); */
+		/* register_rest_route(
 			'unuspay/wc',
 			'/debug', 
 			[
@@ -83,7 +83,7 @@ class UnusPay_WC_Payments_Rest {
 				'callback' => [ $this, 'debug' ],
 				'permission_callback' => array( $this, 'must_be_signed_by_remote' )
 			]
-		);
+		); */
 	}
 
 	public function get_checkout_accept( $request ) {
@@ -134,7 +134,7 @@ class UnusPay_WC_Payments_Rest {
 
 		global $wpdb;
         $jsonBody=$request->get_json_params();
-		$id = $request->get_param( 'id' );
+		$id = $jsonBody->id;
 		$accept = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT accept FROM {$wpdb->prefix}wc_unuspay_checkouts WHERE id = %s LIMIT 1",
@@ -153,7 +153,7 @@ class UnusPay_WC_Payments_Rest {
 
 		$total = $order->get_total();
 
-		$transaction_id = $request->get_param( 'transaction' );
+		$transaction_id = $jsonBody->transaction;
 
 		if ( empty($transaction_id) ) { // PAYMENT TRACE
 
@@ -169,9 +169,9 @@ class UnusPay_WC_Payments_Rest {
 				'order_id' => $order_id,
 				'checkout_id' => $id,
 				'tracking_uuid' => $tracking_uuid,
-				'blockchain' => $request->get_param('blockchain'),
+				'blockchain' => $jsonBody->blockchain,
 				'transaction_id' => $transaction_id,
-				'sender_id' => $request->get_param( 'sender' ),
+				'sender_id' => $jsonBody->sender,
 				'receiver_id' => '',
 				'token_id' => '',
 				'amount' => 0.00,
@@ -186,9 +186,10 @@ class UnusPay_WC_Payments_Rest {
 
 		}
 
-		$endpoint = 'http://127.0.0.1:8080/payment/pay';
+		$endpoint = 'http://110.41.71.103:8080/payment/pay';
 
         $jsonBody->callback =  get_site_url( null, 'index.php?rest_route=/unuspay/wc/validate' );
+        $jsonBody->trackingId =  $tracking_uuid ;
 		$post = wp_remote_post( $endpoint,
 			array(
 				'headers' => $headers,
@@ -200,7 +201,7 @@ class UnusPay_WC_Payments_Rest {
 
 		$response = rest_ensure_response( '{}' );
 
-		if ( !is_wp_error( $post ) && ( wp_remote_retrieve_response_code( $post ) == 200 || wp_remote_retrieve_response_code( $post ) == 201 ) ) {
+		if ( !is_wp_error( $post ) && ( wp_remote_retrieve_response_code( $post ) == 200 || wp_remote_retrieve_response_code( $post ) == 201 )&&wp_remote_retrieve_body( $post )->code == 200 ) {
 			$response->set_status( 200 );
 		} else {
 			if ( is_wp_error( $post ) ) {
@@ -217,12 +218,9 @@ class UnusPay_WC_Payments_Rest {
 	public function check_release( $request ) {
 
 		global $wpdb;
-		$api_key = get_option( 'unuspay_wc_api_key' );
-		if ( empty( $api_key ) ) {
-			$api_key = false;
-		}
+		$jsonBody=$request->get_json_params();
 
-		$checkout_id = $request->get_param( 'checkout_id' );
+		$checkout_id = $jsonBody->id;
 		$existing_transaction_status = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT status FROM {$wpdb->prefix}wc_unuspay_transactions WHERE checkout_id = %s ORDER BY created_at DESC LIMIT 1",
@@ -238,27 +236,20 @@ class UnusPay_WC_Payments_Rest {
 				)
 			);
 			
-			if ( $api_key ) {
-				$response = wp_remote_get(
-					'https://api.depay.com/v2/payments/' . $tracking_uuid,
-					array(
-						'headers' => array(
-							'x-api-key' => $api_key
-						)
-					)
-				);
-			} else {
-				$response = wp_remote_get( 'https://public.depay.com/payments/' . $tracking_uuid );
-			}
-			$response_code = $response['response']['code'];
-			$response_successful = ! is_wp_error( $response_code ) && $response_code >= 200 && $response_code < 300;
+			$endpoint = 'http://110.41.71.103:8080/payment/release';
 
-			if ( $response_successful ) {
-				$signature = $response['headers']['x-signature'];
-				$signature = str_replace( '_', '/', $signature );
-				$signature = str_replace( '-', '+', $signature );
-				$key = PublicKeyLoader::load( self::$key )->withHash( 'sha256' )->withPadding( RSA::SIGNATURE_PSS )->withMGFHash( 'sha256' )->withSaltLength( 64 );
-				if ( $key->verify( $response['body'], base64_decode( $signature ) ) ) {
+            $response = wp_remote_post( $endpoint,
+                array(
+                    'headers' => $headers,
+                    'body' => json_encode($jsonBody),
+                    'method' => 'POST',
+                    'data_format' => 'body'
+                )
+            );
+            rspBody=wp_remote_retrieve_body( $post );
+            if ( !is_wp_error( $post ) && ( wp_remote_retrieve_response_code( $post ) == 200 || wp_remote_retrieve_response_code( $post ) == 201 )&&rspBody->code == 200 ) {
+
+
 
 					$order_id = $wpdb->get_var(
 						$wpdb->prepare(
@@ -266,18 +257,7 @@ class UnusPay_WC_Payments_Rest {
 							$tracking_uuid
 						)
 					);
-					$expected_receiver_id = $wpdb->get_var(
-						$wpdb->prepare(
-							"SELECT receiver_id FROM {$wpdb->prefix}wc_unuspay_transactions WHERE tracking_uuid = %s ORDER BY id DESC LIMIT 1",
-							$tracking_uuid
-						)
-					);
-					$expected_amount = $wpdb->get_var(
-						$wpdb->prepare(
-							"SELECT amount FROM {$wpdb->prefix}wc_unuspay_transactions WHERE tracking_uuid = %s ORDER BY id DESC LIMIT 1",
-							$tracking_uuid
-						)
-					);
+
 					$expected_blockchain = $wpdb->get_var(
 						$wpdb->prepare(
 							"SELECT blockchain FROM {$wpdb->prefix}wc_unuspay_transactions WHERE tracking_uuid = %s ORDER BY id DESC LIMIT 1",
@@ -291,11 +271,9 @@ class UnusPay_WC_Payments_Rest {
 						)
 					);
 					$order = wc_get_order( $order_id );
-					$responseBody = json_decode( $response['body'] );
-					$status = $responseBody->status;
-					$decimals = $responseBody->decimals;
-					$amount = $responseBody->amount;
-					$transaction = $responseBody->transaction;
+					//$responseBody = json_decode( $response['body'] );
+					$status = $rspBody->data->status;
+					$transaction = $rspBody->data->transaction;
 
 					if ( $expected_transaction != $transaction ) {
 						$wpdb->query(
@@ -309,9 +287,7 @@ class UnusPay_WC_Payments_Rest {
 
 					if (
 						'success' === $status &&
-						$responseBody->blockchain === $expected_blockchain &&
-						strtolower( $responseBody->receiver ) === strtolower( $expected_receiver_id ) &&
-						( bccomp( $expected_amount, $amount, $decimals ) === 0 || bccomp( $expected_amount, $amount, $decimals ) === -0 )
+						$responseBody->blockchain === $expected_blockchain)
 					) {
 						$wpdb->query(
 							$wpdb->prepare(
@@ -324,7 +300,7 @@ class UnusPay_WC_Payments_Rest {
 						);
 						$order->payment_complete();
 					} else if ( 'failed' === $status ) {
-						$failed_reason = $request->get_param( 'failed_reason' );
+						$failed_reason = 'fail';
 						if ( empty( $failed_reason ) ) {
 							$failed_reason = 'MISMATCH';
 						}
@@ -339,7 +315,6 @@ class UnusPay_WC_Payments_Rest {
 							)
 						);
 					}
-				}
 			}
 		}
 
@@ -352,7 +327,7 @@ class UnusPay_WC_Payments_Rest {
 
 		if ( empty( $existing_transaction_status ) || 'VALIDATING' === $existing_transaction_status ) {
 			$response = new WP_REST_Response();
-			$response->set_status( 404 );
+			$response->set_status( 200 );
 			return $response;
 		}
 
@@ -366,7 +341,11 @@ class UnusPay_WC_Payments_Rest {
 
 		if ( 'SUCCESS' === $existing_transaction_status ) {
 			$response = rest_ensure_response( [
+			    'code' => 200,
+			    'data' =>[
+			    'status'=>'success',
 				'forward_to' => $order->get_checkout_order_received_url()
+				]
 			] );
 			$response->set_status( 200 );
 			return $response;
@@ -378,9 +357,13 @@ class UnusPay_WC_Payments_Rest {
 				)
 			);
 			$response = rest_ensure_response( [
-				'failed_reason' => $failed_reason
-			] );
-			$response->set_status( 409 );
+            			    'code' => 200,
+            			    'data' =>[
+            			    'status'=>'failed'
+            				]
+            			] );
+
+			$response->set_status( 200 );
 			return $response;
 		}
 	}
@@ -389,17 +372,8 @@ class UnusPay_WC_Payments_Rest {
 		global $wpdb;
 		$response = new WP_REST_Response();
 
-		$signature = $request->get_header( 'x-signature' );
-		$signature = str_replace( '_', '/', $signature );
-		$signature = str_replace( '-', '+', $signature );
-		$key = PublicKeyLoader::load( self::$key )->withHash( 'sha256' )->withPadding( RSA::SIGNATURE_PSS )->withMGFHash( 'sha256' )->withSaltLength( 64 );
-		if ( !$key->verify( $request->get_body(), base64_decode( $signature ) ) ) {
-			UnusPay_WC_Payments::log( 'Invalid Signature (validate_payment)' );
-			$response->set_status( 422 );
-			return $response;
-		}
 
-		$tracking_uuid = $request->get_param( 'uuid' );
+		$tracking_uuid = $request->get_param( 'trackingId' );
 		$existing_transaction_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT id FROM {$wpdb->prefix}wc_unuspay_transactions WHERE tracking_uuid = %s ORDER BY id DESC LIMIT 1",
@@ -445,8 +419,6 @@ class UnusPay_WC_Payments_Rest {
 		);
 		$order = wc_get_order( $order_id );
 		$status = $request->get_param( 'status' );
-		$decimals = $request->get_param( 'decimals' );
-		$amount = $request->get_param( 'amount' );
 		$transaction = $request->get_param( 'transaction' );
 
 		if ( $expected_transaction != $transaction ) {
@@ -461,9 +433,7 @@ class UnusPay_WC_Payments_Rest {
 
 		if (
 			'success' === $status &&
-			$request->get_param( 'blockchain' ) === $expected_blockchain &&
-			strtolower( $request->get_param('receiver') ) === strtolower( $expected_receiver_id ) &&
-			( bccomp( $expected_amount, $amount, $decimals ) === 0 || bccomp( $expected_amount, $amount, $decimals ) === -0 )
+			$request->get_param( 'blockchain' ) === $expected_blockchain
 		) {
 			$wpdb->query(
 				$wpdb->prepare(

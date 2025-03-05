@@ -41,7 +41,7 @@ import SetupTask from './admin/SetupTask'
                   id: "unuspay-woocommerce-payments-settings",
               },
           });
-          pages.push({
+         /* pages.push({
               container: AdminTransactionsPage,
               path: "/unuspay/transactions",
               breadcrumbs: ["UnusPay", "Transactions"],
@@ -50,7 +50,7 @@ import SetupTask from './admin/SetupTask'
               navArgs: {
                   id: "unuspay-woocommerce-payments-transactions",
               },
-          });
+          });*/
           return pages;
       }
   );
