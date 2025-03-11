@@ -26,7 +26,7 @@ class UnusPay_WC_Payments {
 		self::setup_task();
 		self::setup_checkout();
 		self::setup_rest_api();
-		self::setup_denomination();
+		//self::setup_denomination();
 	}
 
 	private static $plugin_headers = null;
@@ -59,8 +59,7 @@ class UnusPay_WC_Payments {
 
 	public static function setup_gateway() {
 		if (
-			!empty( get_option( 'unuspay_wc_accepted_payments' ) ) &&
-			!empty( get_option( 'unuspay_wc_tokens' ) )
+			!empty( get_option( 'unuspay_wc_payment_key' ) )
 		) {
 			add_filter( 'woocommerce_payment_gateways', [ 'UnusPay_WC_Payments', 'add_gateway' ] );
 		}
@@ -108,10 +107,10 @@ class UnusPay_WC_Payments {
 		wp_enqueue_script( 'UNUSPAY_WC_WIDGETS' );
 		wp_register_script( 'UNUSPAY_WC_CHECKOUT', plugins_url( 'dist/checkout.js', UNUSPAY_WC_PLUGIN_FILE ), array( 'wp-api-request', 'jquery' ), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 		wp_enqueue_script( 'UNUSPAY_WC_CHECKOUT' );
-		wp_localize_script('UNUSPAY_WC_CHECKOUT', 'UNUSPAY_WC_CURRENCY', array(
+		/*wp_localize_script('UNUSPAY_WC_CHECKOUT', 'UNUSPAY_WC_CURRENCY', array(
 			'displayCurrency' => ( get_option('unuspay_wc_displayed_currency') ),
 			'storeCurrency' => ( get_option('woocommerce_currency') )
-		));
+		));*/
 	}
 
 	public static function setup_rest_api() {
@@ -125,20 +124,20 @@ class UnusPay_WC_Payments {
 		$controller->register_routes();
 	}
 
-	public static function setup_denomination() {
+	/*public static function setup_denomination() {
 
 		if ( !empty( get_option( 'unuspay_wc_token_for_denomination' ) ) ) {
 			add_filter( 'woocommerce_currencies', [ 'UnusPay_WC_Payments', 'add_crypto_currency' ] );
 			add_filter( 'woocommerce_currency_symbol', [ 'UnusPay_WC_Payments', 'add_crypto_currency_symbol' ], 10, 2 );
 		}
-	}
+	}*/
 
-	public static function add_crypto_currency( $currencies ) {
+	/*public static function add_crypto_currency( $currencies ) {
 
 		$token = json_decode( get_option( 'unuspay_wc_token_for_denomination' ) );
 		$currencies[ $token->symbol ] = $token->name;
 		return $currencies;
-	}
+	}*/
 
 	public static function add_crypto_currency_symbol( $currency_symbol, $currency ) {
 
@@ -150,7 +149,6 @@ class UnusPay_WC_Payments {
 	}
 	
 	public static function log( $text ) {
-		global $wpdb;
-		$wpdb->insert( "{$wpdb->prefix}wc_unuspay_logs", array( 'log' => $text, 'created_at' => current_time( 'mysql' ) ) );
+        error_log(date('Y-m-d H:i:s') . ' ERROR: ' . $text . "\n", 3, ABSPATH . "/wp-content/plugins/web3-woocommerce-unuspay-payments/logs/error.log");
 	}
 }

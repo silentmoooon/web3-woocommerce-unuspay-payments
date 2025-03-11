@@ -1,5 +1,4 @@
 import AdminSettingsPage from './admin/AdminSettingsPage'
-import AdminTransactionsPage from './admin/AdminTransactionsPage'
 import SetupTask from './admin/SetupTask'
 
 (function ( React, hooks ) {

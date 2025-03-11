@@ -165,7 +165,7 @@ class UnusPay_WC_Payments_Rest {
 			
 		} else { // PAYMENT TRACKING
 
-			$result = $wpdb->insert( "{$wpdb->prefix}wc_unuspay_transactions", array(
+			$result = $wpdb->insert( "unuspay_transactions", array(
 				'order_id' => $order_id,
 				'checkout_id' => $id,
 				'tracking_uuid' => $tracking_uuid,
@@ -192,7 +192,6 @@ class UnusPay_WC_Payments_Rest {
         $jsonBody->trackingId =  $tracking_uuid ;
 		$post = wp_remote_post( $endpoint,
 			array(
-				'headers' => $headers,
 				'body' => json_encode($jsonBody),
 				'method' => 'POST',
 				'data_format' => 'body'
@@ -240,14 +239,21 @@ class UnusPay_WC_Payments_Rest {
 
             $response = wp_remote_post( $endpoint,
                 array(
-                    'headers' => $headers,
                     'body' => json_encode($jsonBody),
                     'method' => 'POST',
                     'data_format' => 'body'
                 )
             );
-            rspBody=wp_remote_retrieve_body( $post );
-            if ( !is_wp_error( $post ) && ( wp_remote_retrieve_response_code( $post ) == 200 || wp_remote_retrieve_response_code( $post ) == 201 )&&rspBody->code == 200 ) {
+                $response = wp_remote_post( $endpoint,
+                       array(
+                           'body' => json_encode($jsonBody),
+                           'method' => 'POST',
+                           'data_format' => 'body'
+                       )
+                   );
+                   $rspBody=wp_remote_retrieve_body( $response );
+                   if ( !is_wp_error( $response ) && ( wp_remote_retrieve_response_code( $response ) == 200 || wp_remote_retrieve_response_code( $response ) == 201 )&&$rspBody->code == 200 ) {
+
 
 
 
@@ -287,7 +293,7 @@ class UnusPay_WC_Payments_Rest {
 
 					if (
 						'success' === $status &&
-						$responseBody->blockchain === $expected_blockchain)
+                        $rspBody->data->blockchain === $expected_blockchain
 					) {
 						$wpdb->query(
 							$wpdb->prepare(
@@ -314,6 +320,7 @@ class UnusPay_WC_Payments_Rest {
 								$tracking_uuid
 							)
 						);
+                        $order->update_status('failed', '');
 					}
 			}
 		}
@@ -632,42 +639,5 @@ public function must_be_signed_by_remote( $request ) {
 		return $response;
 	}
 
-	public function debug( $request ) {
-		global $wpdb;
 
-		$post_response = wp_remote_post( 'https://public.depay.com', array(
-			'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-			'body' => json_encode( [] ),
-			'method' => 'POST',
-			'data_format' => 'body'
-		) );
-		$post_response_code = $post_response['response']['code'];
-		$post_response_successful = ! is_wp_error( $post_response_code ) && $post_response_code >= 200 && $post_response_code < 300;
-		$get_response = wp_remote_get( 'https://public.depay.com' );
-		$get_response_code = $get_response['response']['code'];
-		$get_response_successful = ! is_wp_error( $get_response_code ) && $get_response_code >= 200 && $get_response_code < 300;
-		$last_logs = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}wc_unuspay_logs ORDER BY created_at DESC LIMIT 10" );
-		$extensions = get_loaded_extensions();
-		$bcmath_exists = in_array('bcmath', $extensions, true);
-
-		$response = rest_ensure_response( [ 
-			'wc' => wc()->version,
-			'wp' => $GLOBALS[ 'wp_version' ],
-			'unuspay' => UNUSPAY_CURRENT_VERSION,
-			'is_ssl' => is_ssl(),
-			'bcmath' => $bcmath_exists,
-			'curl' => ( function_exists( 'fsockopen' ) || function_exists( 'curl_init' ) ),
-			'api' => !empty( get_option( 'unuspay_wc_api_key' ) ),
-			'GET' => $get_response_successful,
-			'POST' => $post_response_successful,
-			'currency' => get_option( 'woocommerce_currency' ),
-			'address' => get_option( 'unuspay_wc_receiving_wallet_address' ),
-			'accept' => get_option( 'unuspay_wc_accepted_payments' ),
-			'db' => get_option( 'unuspay_wc_db_version' ),
-			'logs' => $last_logs
-		] );
-		$response->set_status( 200 );
-
-		return $response;
-	}
 }

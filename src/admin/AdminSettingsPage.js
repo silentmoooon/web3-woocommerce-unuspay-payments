@@ -12,64 +12,13 @@ export default function(props) {
   const [ paymentKey, setPaymentKey ] = useState()
 
 
-  const setReceivingWalletAddress = (receiver, index, blockchain)=>{
-    
-    let newTokens = [...tokens]
-    if(!receiver || receiver.length === 0) {
-      newTokens[index].error = 'Please enter a receiver address!'
-    } else {
-      try {
-        if(blockchain === 'solana') {
-          receiver = new SolanaWeb3js.PublicKey(receiver).toString()
-        } else {
-          receiver = ethers.ethers.utils.getAddress(receiver)
-        }
-        newTokens[index].error = undefined
-      } catch {
-        newTokens[index].error = 'This address is invalid!'
-      }
-    }
 
-    newTokens[index].receiver = receiver
-    setTokens(newTokens)
-  }
-
-  const connectWallet = async(index, blockchain)=> {
-    let { account, accounts, wallet }  = await window.DePayWidgets.Connect()
-    setReceivingWalletAddress(account, index, blockchain)
-  }
-
-  const addToken = async ()=>{
-    let token = await DePayWidgets.Select({ what: 'token' })
-    if((tokens instanceof Array) && tokens.find((selectedToken)=>(selectedToken.blockchain == token.blockchain && selectedToken.address == token.address))) { return }
-    token.error = 'Please enter a receiver address!'
-    if(tokens instanceof Array) {
-      setTokens(tokens.concat([token]))
-    } else {
-      setTokens([token])
-    }
-  }
-
-  const removeToken = (index)=> {
-    let newTokens = tokens.slice()
-    newTokens.splice(index, 1)
-    setTokens(newTokens)
-  }
-
-  const selectTokenForDenomination = async ()=>{
-    let token = await DePayWidgets.Select({ what: 'token' })
-    setTokenForDenomination(token)
-  }
-
-  const unsetTokenForDenomination = ()=> {
-    setTokenForDenomination(undefined)
-  }
 
   const saveSettings = () => {
       setIsSaving(true);
       const settings = new window.wp.api.models.Settings({
 
-          depay_wc_checkout_title: checkoutTitle,
+          unuspay_wc_checkout_title: checkoutTitle,
           unuspay_wc_payment_key: paymentKey,
       });
 
@@ -96,36 +45,13 @@ export default function(props) {
           .catch(() => {});
   }, []);
 
-  useEffect(() => {
-      if (tokens) {
-          let count = {};
-          tokens.forEach((token) => {
-              if (count[token.blockchain] == undefined) {
-                  count[token.blockchain] = 1;
-              } else {
-                  count[token.blockchain] += 1;
-              }
-          });
-          setTooManyTokensPerChain(
-              !!Object.values(count).find((value) => value > 2)
-          );
-      }
-  }, [tokens]);
+
 
   useEffect(() => {
       setIsDisabled(
-          !(
-              tokens &&
-              tokens.length &&
-              tokens.every(
-                  (token) =>
-                      token.receiver &&
-                      token.receiver.length > 0 &&
-                      token.error === undefined
-              )
-          )
+          !paymentKey
       );
-  }, [tokens]);
+  }, paymentKey);
 
   if (!settingsAreLoaded) {
       return null;

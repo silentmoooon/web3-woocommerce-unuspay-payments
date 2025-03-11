@@ -24,18 +24,6 @@ jQuery(function ($) {
     });
 });
 
-const feeReceivers = {
-    ethereum: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    bsc: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    polygon: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    solana: "5hqJfrh7SrokFqj16anNqACyUv1PCg7oEqi7oUya1kMQ",
-    fantom: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    gnosis: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    avalanche: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    arbitrum: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    optimism: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-    base: "0x9Db58B260EfAa2d6a94bEb7E219d073dF51cc7Bb",
-};
 
 const displayCheckout = async () => {
     if (window.location.hash.startsWith("#wc-unuspay-checkout-")) {

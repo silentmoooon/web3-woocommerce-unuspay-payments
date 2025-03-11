@@ -32,7 +32,7 @@ class UnusPay_WC_Payments_Admin {
 		wp_enqueue_script( 'UNUSPAY_WC_REACT_TOKEN_IMAGE' );
 		wp_register_script('UNUSPAY_WC_ADMIN', plugins_url( 'dist/admin.js', UNUSPAY_WC_PLUGIN_FILE ), array('react', 'react-dom', 'wp-hooks', 'wp-element', 'wp-components', 'wp-api', 'wc-components', 'wc-navigation', 'UNUSPAY_WC_REACT_TOKEN_IMAGE'), UNUSPAY_CURRENT_VERSION, true);
 		wp_localize_script('UNUSPAY_WC_ADMIN', 'UNUSPAY_WC_SETUP', array(
-			'done' => ( !empty(get_option('unuspay_wc_accepted_payments')) && !empty(get_option('unuspay_wc_tokens')) ),
+			'done' => ( !empty(get_option('unuspay_wc_payment_key')) ),
 			'bcmath' => in_array('bcmath', $extensions, true),
 		));
 		wp_enqueue_script( 'UNUSPAY_WC_ADMIN' );
@@ -58,7 +58,7 @@ class UnusPay_WC_Payments_Admin {
 			]
 		);
 		
-		wc_admin_register_page(
+		/*wc_admin_register_page(
 			[
 				'id'         => 'unuspay-woocommerce-payments-transactions',
 				'title'      => 'Transactions',
@@ -70,7 +70,7 @@ class UnusPay_WC_Payments_Admin {
 					'order'  => 10
 				]
 			]
-		);
+		);*/
 
 		wc_admin_register_page(
 			[
@@ -81,7 +81,7 @@ class UnusPay_WC_Payments_Admin {
 				'path'       => '/unuspay/settings',
 				'nav_args'   => [
 					'parent'   => 'unuspay-woocommerce-payments',
-					'order'  => 20
+					'order'  => 10
 				]
 			]
 		);

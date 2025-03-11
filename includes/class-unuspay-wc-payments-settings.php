@@ -14,7 +14,7 @@ class UnusPay_WC_Payments_Settings {
 
 		register_setting(
 			'unuspay_wc',
-			'unuspay_wc_payment_pey',
+			'unuspay_wc_payment_key',
 			[
 				'type' => 'string',
 				'show_in_rest' => true,

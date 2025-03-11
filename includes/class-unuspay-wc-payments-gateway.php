@@ -135,7 +135,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
     				'accept-language' => $lang,
     				'Content-Type' => 'application/json; charset=utf-8',
     			);
-	    $website=get_option("website");
+	    $website=get_option("siteurl");
 
 		$total = $order->get_total();
 		$currency = $order->get_currency();
@@ -178,6 +178,6 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway {
 	}
 
 	public function admin_options() {
-		wp_redirect( '/wp-admin/admin.php?page=wc-admin&path=%2Fdepay%2Fsettings' );
+		wp_redirect( '/wp-admin/admin.php?page=wc-admin&path=%2Funuspay%2Fsettings' );
 	}
 }
