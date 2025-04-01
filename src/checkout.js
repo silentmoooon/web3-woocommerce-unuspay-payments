@@ -60,45 +60,21 @@ const displayCheckout = async () => {
                 window.location.reload(true);
             },
             track: {
-                method: (payment) => {
-                    return new Promise((resolve, reject) => {
-                        try {
-                            wp.apiRequest({
-                                path: `/unuspay/wc/checkouts/${checkoutId}/track`,
-                                method: "POST",
-                                data: payment,
-                            })
-                                .done(() => resolve({ status: 200 }))
-                                .fail((request, status) => reject(status));
-                        } catch {
-                            reject();
-                        }
-                    });
-                },
+                id: checkoutId,
+                endpoint: "/wp-json/unuspay/wc/track",
                 poll: {
-                    method: () => {
-                        return new Promise((resolve, reject) => {
-                            wp.apiRequest({
-                                path: "/unuspay/wc/release",
-                                method: "POST",
-                                data: { checkout_id: checkoutId },
-                            })
-                                .done((responseData) => {
-                                    resolve(responseData);
-                                })
-                                .fail(resolve);
-                        });
-                    },
-                },
+                    endpoint: "/wp-json/unuspay/wc/release"
+                }
+
             },
         };
-        if (
-            window.UNUSPAY_WC_CURRENCY &&
-            window.UNUSPAY_WC_CURRENCY.displayCurrency == "store" &&
-            window.UNUSPAY_WC_CURRENCY.storeCurrency?.length
-        ) {
-            configuration.currency = window.UNUSPAY_WC_CURRENCY.storeCurrency;
-        }
+        // if (
+        //     window.UNUSPAY_WC_CURRENCY &&
+        //     window.UNUSPAY_WC_CURRENCY.displayCurrency == "store" &&
+        //     window.UNUSPAY_WC_CURRENCY.storeCurrency?.length
+        // ) {
+        //     configuration.currency = window.UNUSPAY_WC_CURRENCY.storeCurrency;
+        // }
         DePayWidgets.Payment(configuration);
     }
 };

@@ -83,11 +83,10 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
 
         if ($order->get_total() > 0) {
 
-            $checkout_id = wp_generate_uuid4();
-            $accept = $this->getUnusPayOrder($order, $checkout_id);
+            $accept = $this->getUnusPayOrder($order);
 
             $result = $wpdb->insert("{$wpdb->prefix}wc_unuspay_checkouts", array(
-                'id' => $checkout_id,
+                'id' => $accept->id,
                 'order_id' => $order_id,
                 'accept' => json_encode($accept),
                 'created_at' => current_time('mysql')
@@ -97,46 +96,21 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
                 UnusPay_WC_Payments::log('Storing checkout failed: ' . $error_message);
                 throw new Exception('Storing checkout failed: ' . $error_message);
             }
+          /*   $redirect_url = "Location: " . '#wc-unuspay-checkout-' . $accept->id . '@' . time();
+            header($redirect_url);
+            die();
+            return rest_ensure_response('{}'); */
             return ([
                 'result' => 'success',
-                'redirect' => '#wc-unuspay-checkout-' . $checkout_id . '@' . time()
+                'redirect' => '#wc-unuspay-checkout-' . $accept->id . '@' . time()
                 // 'redirect'       => get_option('woocommerce_enable_signup_and_login_from_checkout') === 'yes' ? $order->get_checkout_payment_url() . '#wc-depay-checkout-' . $checkout_id . '@' . time() : '#wc-depay-checkout-' . $checkout_id . '@' . time()
             ]);
         } else {
             $order->payment_complete();
         }
     }
-
-    public function round_token_amount($amount)
-    {
-        $amount = strval($amount);
-        preg_match('/\d+\.0*(\d{4})/', $amount, $digits_after_decimal);
-        if (!empty($digits_after_decimal)) {
-            $digits_after_decimal = $digits_after_decimal[0];
-            preg_match('/\d{4}$/', $digits_after_decimal, $focus);
-            $focus = $focus[0];
-            if (preg_match('/^0/', $focus)) {
-                $float = floatval("$focus[1].$focus[2]$focus[3]");
-                $fixed = '0' . number_format(round($float, 2), 2, '', '');
-            } else {
-                $float = floatval("$focus[0].$focus[1]$focus[2]9");
-                $fixed = number_format(round($float, 2), 2, '', '');
-            }
-            if ('0999' == $fixed && round($amount, 0) == 0) {
-                return preg_replace('/\d{4}$/', '1000', $digits_after_decimal);
-            } elseif ('1000' == $fixed && round($amount, 0) == 0) {
-                return preg_replace('/\d{5}$/', '1000', $digits_after_decimal);
-            } elseif ('0' != $fixed[0] && strlen($fixed) > 3) {
-                return round($amount, 0);
-            } else {
-                return preg_replace('/\d{4}$/', $fixed, $digits_after_decimal);
-            }
-        } else {
-            return $amount;
-        }
-    }
-
-    public function getUnusPayOrder($order, $checkout_id)
+ 
+    public function getUnusPayOrder($order)
     {
         $lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
         $headers = array(
@@ -157,21 +131,21 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
             array(
                 'headers' => $headers,
                 'body' => json_encode([
-                    'checkout_id' => $checkout_id,
                     'website' => $website,
                     'lang' => $lang,
                     'orderNo' => $order->get_id(),
                     'email' => $order->get_billing_email(),
                     'payLinkId' => $payment_key,
                     'currency' => $currency,
-                    'amount' => $order->get_total()
+                    'amount' => $order->get_total(),
+                    'commerceType'=>1
                 ]),
                 'method' => 'POST',
                 'data_format' => 'body'
             )
         );
         $post_response_code = $post_response['response']['code'];
-        $post_response_successful = !is_wp_error($post_response_code) && $post_response_code >= 200 && $post_response_code < 300;
+        $post_response_successful = !is_wp_error($post_response_code) && $post_response_code == 200 ;
         if (!$post_response_successful) {
             UnusPay_WC_Payments::log('ecommerce order failed!' . $post_response->get_error_message());
             throw new Exception('request failed!');
