@@ -343,8 +343,8 @@ class UnusPay_WC_Payments_Rest {
 			$response = rest_ensure_response( [
 			    'code' => 200,
 			    'data' =>[
-			    'status'=>'success',
-				'forward_to' => $order->get_checkout_order_received_url()
+                    'status'=>'success',
+                    'forward_to' => $order->get_checkout_order_received_url()
 				]
 			] );
 			$response->set_status( 200 );
@@ -359,7 +359,7 @@ class UnusPay_WC_Payments_Rest {
 			$response = rest_ensure_response( [
             			    'code' => 200,
             			    'data' =>[
-            			    'status'=>'failed'
+            			        'status'=>'failed'
             				]
             			] );
 

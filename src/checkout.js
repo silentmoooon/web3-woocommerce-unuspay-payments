@@ -16,7 +16,7 @@ jQuery(function ($) {
     $("form.woocommerce-checkout").on("submit", async () => {
         var values = $("form.woocommerce-checkout").serialize();
         if (values.match("payment_method=unuspay_wc_payments")) {
-            let { unmount } = await DePayWidgets.Loading({
+            let { unmount } = await UnusPayWidgets.Loading({
                 text: "Loading payment data...",
             });
             setTimeout(unmount, 10000);
@@ -75,7 +75,7 @@ const displayCheckout = async () => {
         // ) {
         //     configuration.currency = window.UNUSPAY_WC_CURRENCY.storeCurrency;
         // }
-        DePayWidgets.Payment(configuration);
+        UnusPayWidgets.Payment(configuration);
     }
 };
 

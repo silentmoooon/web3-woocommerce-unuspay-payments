@@ -24,8 +24,6 @@ class UnusPay_WC_Payments_Admin {
 		wp_enqueue_script( 'UNUSPAY_WC_BLOCKCHAINS' );
 		wp_register_script('UNUSPAY_WC_CLIENT', plugins_url( 'dist/web3-client.js', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION, true);
 		wp_enqueue_script( 'UNUSPAY_WC_CLIENT' );
-		wp_register_script('UNUSPAY_WC_WIDGETS', plugins_url( 'dist/widgets.bundle.js', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION, true);
-		wp_enqueue_script( 'UNUSPAY_WC_WIDGETS' );
 		wp_register_style( 'UNUSPAY_WC_ADMIN', plugins_url( 'assets/css/admin.css', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION );
 		wp_enqueue_style( 'UNUSPAY_WC_ADMIN' );
 		wp_register_script('UNUSPAY_WC_REACT_TOKEN_IMAGE', plugins_url( 'dist/react-token-image.js', UNUSPAY_WC_PLUGIN_FILE ), array('react', 'react-dom', 'UNUSPAY_WC_ETHERS', 'UNUSPAY_WC_SOLANA_WEB3', 'UNUSPAY_WC_BLOCKCHAINS', 'UNUSPAY_WC_CLIENT'), UNUSPAY_CURRENT_VERSION, true);
