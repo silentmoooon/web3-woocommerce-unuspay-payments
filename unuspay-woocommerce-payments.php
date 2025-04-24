@@ -39,7 +39,7 @@ function unuspay_run_migration() {
 	dbDelta("
 
 		CREATE TABLE {$wpdb->prefix}wc_unuspay_checkouts (
-			id VARCHAR(36) NOT NULL,
+			id VARCHAR(64) NOT NULL,
 			order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
 			accept LONGTEXT NOT NULL,
 			created_at datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
@@ -48,7 +48,7 @@ function unuspay_run_migration() {
         CREATE TABLE {$wpdb->prefix}wc_unuspay_transactions (
         			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         			order_id BIGINT UNSIGNED NOT NULL DEFAULT 0,
-        			checkout_id VARCHAR(36) NOT NULL,
+        			checkout_id VARCHAR(64) NOT NULL,
         			tracking_uuid TINYTEXT NOT NULL,
         			blockchain TINYTEXT NOT NULL,
         			transaction_id TINYTEXT NOT NULL,

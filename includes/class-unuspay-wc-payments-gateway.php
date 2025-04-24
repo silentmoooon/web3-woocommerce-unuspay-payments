@@ -127,7 +127,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
             throw new Exception('No payment key found!');
         }
 
-        $post_response = wp_remote_post("http://110.41.71.103:9080/payment/ecommerce/order",
+        $post_response = wp_remote_post("https://app.unuspay.com/api/payment/ecommerce/order",
             array(
                 'headers' => $headers,
                 'body' => json_encode([

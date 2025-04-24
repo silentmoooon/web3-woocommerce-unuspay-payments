@@ -194,7 +194,7 @@ class UnusPay_WC_Payments_Rest {
             }
 		}
 
-		$endpoint = 'http://110.41.71.103:9080/payment/pay';
+		$endpoint = 'https://app.unuspay.com/api/payment/pay';
 
         $jsonBody["callback"] = get_site_url(null, 'wp-json/unuspay/wc/validate');
         $jsonBody["trackingId"] = $tracking_uuid;
@@ -240,7 +240,7 @@ class UnusPay_WC_Payments_Rest {
 				)
 			);
 			
-			$endpoint = 'http://110.41.71.103:8080/payment/release';
+			$endpoint = 'https://app.unuspay.com/api/payment/release';
             $headers = array(
                 'Content-Type' => 'application/json; charset=utf-8',
             );
