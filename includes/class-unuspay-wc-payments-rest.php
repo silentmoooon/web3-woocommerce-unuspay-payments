@@ -357,7 +357,7 @@ class UnusPay_WC_Payments_Rest {
 				)
 			);
 			$response = rest_ensure_response( [
-            			    'code' => 200,
+            			    'code' => 500,
             			    'data' =>[
             			        'status'=>'failed'
             				]
