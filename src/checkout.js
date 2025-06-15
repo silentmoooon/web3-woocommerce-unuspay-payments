@@ -67,7 +67,21 @@ const displayCheckout = async () => {
                 }
 
             },
+            style:{colors:{}},
+
         };
+        if(response.colorBody && response.colorBody.colorSwitch){
+             
+            if(response.colorBody.buttonColor&&response.colorBody.buttonColor!=""){
+                configuration.style.colors.primary=response.colorBody.buttonColor;
+            }
+            if(response.colorBody.buttonTextColor&&response.colorBody.buttonTextColor!=""){
+                configuration.style.colors.buttonText=response.colorBody.buttonTextColor;
+            }
+             if(response.colorBody.buttonFont&&response.colorBody.buttonFont!=""){
+                configuration.style.fontFamily=response.colorBody.buttonFont;
+            }
+        }
         // if (
         //     window.UNUSPAY_WC_CURRENCY &&
         //     window.UNUSPAY_WC_CURRENCY.displayCurrency == "store" &&

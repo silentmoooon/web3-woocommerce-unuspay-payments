@@ -16,7 +16,7 @@ const files = [
 export default files.map((file)=>{
   return({
     input: file,
-    output: [ { format: 'umd', globals: globals, dir: 'dist' } ],
+    output: [ { format: 'umd', globals: globals, dir: 'dist',name:'file' } ],
     plugins: [
       sucrase({
         exclude: ['node_modules/**'],
