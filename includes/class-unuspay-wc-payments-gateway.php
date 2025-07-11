@@ -33,15 +33,26 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
     public function get_icon()
     {
         $icon = '';
-        if (empty(get_option('unuspay_wc_blockchains'))) {
+        if (empty(get_option('unuspay_wc_payment_key'))) {
             $icon = '';
-        } else if (null != $this->blockchain) {
-            $url = esc_url(plugin_dir_url(__FILE__) . 'images/blockchains/' . $this->blockchain . '.svg');
-            $icon = $icon . "<img title='Payments on " . ucfirst($this->blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
-        } else {
-            $blockchains = json_decode(get_option('unuspay_wc_blockchains'));
-            $index = 0;
-            foreach ($blockchains as $blockchain) {
+        }  else {
+            $post_response = wp_remote_get("https://app.unuspay.com/api/payment/link/blockchains?linkId=" . get_option('unuspay_wc_payment_key'),
+            array(
+                 
+                'method' => 'GET'
+                
+            )
+        );
+        $post_response_code = $post_response['response']['code'];
+        $post_response_successful = !is_wp_error($post_response_code) && $post_response_code == 200 ;
+        if (!$post_response_successful) {
+            $icon = '';
+        }
+        $post_response_json = json_decode($post_response['body']);
+        if ($post_response_json->code != 200) {
+            $icon = '';
+        }
+            foreach ($post_response_json->data as $blockchain) {
                 $url = esc_url(plugin_dir_url(__FILE__) . 'images/blockchains/' . $blockchain . '.svg');
                 $icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
             }
@@ -163,4 +174,6 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
     {
         wp_redirect('/wp-admin/admin.php?page=wc-admin&path=%2Funuspay%2Fsettings');
     }
+
+    
 }

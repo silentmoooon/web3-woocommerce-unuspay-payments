@@ -48,7 +48,8 @@ class UnusPay_WC_Payments_Rest {
 				'permission_callback' => '__return_true'
 			]
 		);
-		/* register_rest_route(
+        /*
+		 register_rest_route(
 			'unuspay/wc',
 			'/transactions',
 			[
@@ -57,6 +58,7 @@ class UnusPay_WC_Payments_Rest {
 				'permission_callback' => array( $this, 'must_be_wc_admin' ) 
 			]
 		);
+        
 		register_rest_route(
 			'unuspay/wc',
 			'/transaction',
