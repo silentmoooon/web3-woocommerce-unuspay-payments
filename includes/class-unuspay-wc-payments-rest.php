@@ -196,7 +196,7 @@ class UnusPay_WC_Payments_Rest {
             }
 		}
 
-		$endpoint = 'https://app.unuspay.com/api/payment/pay';
+		$endpoint = 'https://dapp.unuspay.com/api/payment/pay';
 
         $jsonBody["callback"] = get_site_url(null, 'wp-json/unuspay/wc/validate');
         $jsonBody["trackingId"] = $tracking_uuid;
@@ -242,7 +242,7 @@ class UnusPay_WC_Payments_Rest {
 				)
 			);
 			
-			$endpoint = 'https://app.unuspay.com/api/payment/release';
+			$endpoint = 'https://dapp.unuspay.com/api/payment/release';
             $headers = array(
                 'Content-Type' => 'application/json; charset=utf-8',
             );

@@ -36,7 +36,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         if (empty(get_option('unuspay_wc_payment_key'))) {
             $icon = '';
         }  else {
-            $post_response = wp_remote_get("https://app.unuspay.com/api/payment/link/blockchains?linkId=" . get_option('unuspay_wc_payment_key'),
+            $post_response = wp_remote_get("https://dapp.unuspay.com/api/payment/link/blockchains?linkId=" . get_option('unuspay_wc_payment_key'),
             array(
                  
                 'method' => 'GET'
@@ -73,7 +73,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
             'title' => array(
                 'title' => 'Title',
                 'type' => 'text',
-                'description' => __('This controls the title which the user sees during checkout.'),
+                'description' => 'This controls the title which the user sees during checkout.',
                 'default' => 'UnusPay',
                 'desc_tip' => true,
             ),
@@ -105,7 +105,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
             if (false === $result) {
                 $error_message = $wpdb->last_error;
                 UnusPay_WC_Payments::log('Storing checkout failed: ' . $error_message);
-                throw new Exception('Storing checkout failed: ' . $error_message);
+                throw new Exception('Storing checkout failed: ');
             }
           /*   $redirect_url = "Location: " . '#wc-unuspay-checkout-' . $accept->id . '@' . time();
             header($redirect_url);
@@ -138,7 +138,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
             throw new Exception('No payment key found!');
         }
 
-        $post_response = wp_remote_post("https://app.unuspay.com/api/payment/ecommerce/order",
+        $post_response = wp_remote_post("https://dapp.unuspay.com/api/payment/ecommerce/order",
             array(
                 'headers' => $headers,
                 'body' => json_encode([

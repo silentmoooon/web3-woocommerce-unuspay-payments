@@ -149,6 +149,6 @@ class UnusPay_WC_Payments {
 	}
 	
 	public static function log( $text ) {
-        error_log(date('Y-m-d H:i:s') . ' ERROR: ' . $text . "\n", 3, ABSPATH . "/wp-content/plugins/web3-woocommerce-unuspay-payments/logs/error.log");
+        error_log(gmdate('Y-m-d H:i:s') . ' ERROR: ' . $text . "\n", 3, ABSPATH . "/wp-content/plugins/web3-woocommerce-unuspay-payments/logs/error.log");
 	}
 }
