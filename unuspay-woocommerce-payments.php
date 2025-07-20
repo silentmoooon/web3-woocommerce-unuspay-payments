@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: unuspay Payments for WooCommerce
- * Plugin URI: https://unuspay.com/plugins/woocommerce
+ * Plugin URI: https://unuspay.com
  * Description: unuspay Payments directly into your own wallet.
  * Author: unuspay
  * Author URI: https://unuspay.com

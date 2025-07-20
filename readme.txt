@@ -29,11 +29,11 @@ Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and 
 
 == Supported Wallets ==
 
-UnusPay supports [most crypto wallets](https://depay.com/wallets).
+UnusPay supports [most crypto wallets](https://unuspay.com/wallets).
 
 == Supported Tokens ==
 
 All* standard tokens.
 
-* if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://depay.com/docs/payments/supported/tokens/).
+* if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://unuspay.com/docs/payments/supported/tokens/).
 
