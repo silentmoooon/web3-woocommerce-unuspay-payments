@@ -10,6 +10,12 @@
   margin-left: .25em;
   max-height: 28px;
 }
+.wc-unuspay-blockchain-logo {
+  margin-left: -.10em !important;
+  margin-right: .50em !important;
+  max-height: 28px;
+}
+
 
 .wc-block-checkout__payment-method .wc-block-components-radio-control__label>span {
   width: 95%;

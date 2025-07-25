@@ -8,7 +8,6 @@ class UnusPay_WC_Payments {
 	private static $settings;
 	
 	public static function init() {
-
 		define( 'UNUSPAY_VERSION_NUMBER', self::get_plugin_headers()['Version'] );
 
 		if ( !class_exists( 'WooCommerce' ) ) {
@@ -58,15 +57,12 @@ class UnusPay_WC_Payments {
 	}
 
 	public static function setup_gateway() {
-		if (
-			!empty( get_option( 'unuspay_wc_payment_key' ) )
-		) {
+		 
 			add_filter( 'woocommerce_payment_gateways', [ 'UnusPay_WC_Payments', 'add_gateway' ] );
-		}
+		 
 	}
 
 	public static function add_gateway( $gateways ) {
-
 			$gateways[] = 'UnusPay_WC_Payments_Gateway';
 
 
