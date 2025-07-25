@@ -1,4 +1,4 @@
-=== unuspay Payments for WooCommerce ===
+=== UnusPay Crypto Payments(10chains,10000cryptos) ===
 Contributors: depayfi
 Tags: web3, payments, woocommerce, depay, cryptocurrency
 Requires at least: 6.0
