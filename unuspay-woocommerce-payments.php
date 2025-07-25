@@ -10,12 +10,12 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Domain Path: /languages
  * WC requires at least: 6.2
- * WC tested up to: 8.7.0
+ * WC tested up to: 9.8.5
  * Requires at least: 6.0
  * Requires PHP: 7.2
  * Version: 1.0.0
  *
- * @package woocommerce\Payments
+ * @package UnusPay\Payments
  */
 
 defined( 'ABSPATH' ) || exit;

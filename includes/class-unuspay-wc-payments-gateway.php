@@ -14,7 +14,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
     {
         $this->id = static::GATEWAY_ID;
         $this->method_title = 'UnusPay';
-        $this->method_description = 'Web3 Payments directly into your wallet. Accept any token with on-the-fly conversion.';
+        $this->method_description = 'Web3 Cryptocurrency Payments with UnusPay';
         $this->supports = ['products'];
         $this->init_form_fields();
         $this->init_settings();
@@ -52,6 +52,8 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         if ($post_response_json->code != 200) {
             $icon = '';
         }
+        $url = esc_url(plugin_dir_url(__FILE__) . 'images/logo.jpg');
+        $icon = $icon . "<img title='Unuspay' class='wc-unuspay-blockchain-logo' src='" . $url . "'/>";
             foreach ($post_response_json->data as $blockchain) {
                 $url = esc_url(plugin_dir_url(__FILE__) . 'images/blockchains/' . $blockchain . '.svg');
                 $icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
