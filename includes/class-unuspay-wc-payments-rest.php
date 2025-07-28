@@ -48,44 +48,7 @@ class UnusPay_WC_Payments_Rest {
 				'permission_callback' => '__return_true'
 			]
 		);
-        /*
-		 register_rest_route(
-			'unuspay/wc',
-			'/transactions',
-			[
-				'methods' => 'GET',
-				'callback' => [ $this, 'fetch_transactions' ],
-				'permission_callback' => array( $this, 'must_be_wc_admin' ) 
-			]
-		);
-        
-		register_rest_route(
-			'unuspay/wc',
-			'/transaction',
-			[
-				'methods' => 'DELETE',
-				'callback' => [ $this, 'delete_transaction' ],
-				'permission_callback' => array( $this, 'must_be_wc_admin' ) 
-			]
-		); */
-		/* register_rest_route(
-			'unuspay/wc',
-			'/confirm',
-			[
-				'methods' => 'POST',
-				'callback' => [ $this, 'confirm_payment' ],
-				'permission_callback' => array( $this, 'must_be_wc_admin' )
-			]
-		); */
-		/* register_rest_route(
-			'unuspay/wc',
-			'/debug', 
-			[
-				'methods' => 'GET',
-				'callback' => [ $this, 'debug' ],
-				'permission_callback' => array( $this, 'must_be_signed_by_remote' )
-			]
-		); */
+       
 	}
 
 	public function get_checkout_accept( $request ) {

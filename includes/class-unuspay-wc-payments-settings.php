@@ -18,7 +18,7 @@ class UnusPay_WC_Payments_Settings {
 			[
 				'type' => 'string',
 				'show_in_rest' => true,
-				'default' => null
+                'sanitize_callback' => 'sanitize_text_field',
 			]
 		);
 
