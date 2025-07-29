@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: UnusPay Crypto Payments for WooCommerce
- * Plugin URI: https://unuspay.com/plugins/woocommerce
+ * Plugin Name: unuspay crypto payments
+ * Plugin URI: https://unuspay.com/e-commerce
  * Description: unuspay Payments directly into your own wallet.
  * Author: unuspay
  * Author URI: https://unuspay.com
- * Text Domain: UnusPay Crypto Payments for WooCommerce
+ * Text Domain: unuspay crypto payments
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Domain Path: /languages

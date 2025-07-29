@@ -179,8 +179,8 @@
       } else if(source == 'web3-blockchains') {
         setSource(logoFromRepository({ blockchain, address }), 'repository');
       } else if(source == 'repository') {
-        setSource(`https://integrate.depay.com/tokens/${blockchain}/${address}/image`, 'depay');
-      } else if (source == 'depay' && supported.evm.includes(blockchain)) {
+        setSource(`https://dapp.unuspay.com/api/tokens/${blockchain}/${address}/image`, 'depay');
+      } else if (source == 'unuspay' && supported.evm.includes(blockchain)) {
         if(id) {
           web3Client.request({ blockchain, address, api: uriAPI, method: 'uri', params: [id] }).then((uri)=>{
             uri = uri.match('0x{id}') ? uri.replace('0x{id}', id) : uri;
