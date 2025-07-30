@@ -25,17 +25,17 @@ prompt.get(['version'], async (err, result)=> {
       to: `*** UnusPay Web3 Payments for WooCommerce Changelog ***\n\n${year}-${month}-${day} - version ${result.version}\n*`,
   });
   await replace({
-      files: "./unuspay-woocommerce-payments.php",
+      files: "./unuspay-crypto-payments-for-woocommerce.php",
       from: `* Version: ${package.version}`,
       to: `* Version: ${result.version}`,
   });
   await replace({
-      files: "./unuspay-woocommerce-payments.php",
+      files: "./unuspay-crypto-payments-for-woocommerce.php",
       from: `define( 'UNUSPAY_CURRENT_VERSION', '${package.version}' );`,
       to: `define( 'UNUSPAY_CURRENT_VERSION', '${result.version}' );`,
   });
   await replace({
-      files: "./languages/unuspay-woocommerce-payments.pot",
+      files: "./languages/unuspay-crypto-payments-for-woocommerce.pot",
       from: `Project-Id-Version: UnusPay WooCommerce Payments ${package.version}`,
       to: `Project-Id-Version: UnusPay WooCommerce Payments ${result.version}`,
   });

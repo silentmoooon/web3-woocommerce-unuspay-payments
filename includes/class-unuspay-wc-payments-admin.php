@@ -42,7 +42,7 @@ class UnusPay_WC_Payments_Admin {
 
 		wc_admin_register_page(
 			[
-				'id'         => 'unuspay-woocommerce-payments',
+				'id'         => 'unuspay-crypto-payments-for-woocommerce',
 				'title'      => 'UnusPay',
 				'path'       => '/unuspay/settings',
 				'capability' => '',
@@ -58,13 +58,13 @@ class UnusPay_WC_Payments_Admin {
 		
 		/*wc_admin_register_page(
 			[
-				'id'         => 'unuspay-woocommerce-payments-transactions',
+				'id'         => 'unuspay-crypto-payments-for-woocommerce-transactions',
 				'title'      => 'Transactions',
 				'capability' => 'manage_woocommerce',
-				'parent'     => 'unuspay-woocommerce-payments',
+				'parent'     => 'unuspay-crypto-payments-for-woocommerce',
 				'path'       => '/unuspay/transactions',
 				'nav_args'   => [
-					'parent'   => 'unuspay-woocommerce-payments',
+					'parent'   => 'unuspay-crypto-payments-for-woocommerce',
 					'order'  => 10
 				]
 			]
@@ -72,13 +72,13 @@ class UnusPay_WC_Payments_Admin {
 
 		wc_admin_register_page(
 			[
-				'id'         => 'unuspay-woocommerce-payments-settings',
+				'id'         => 'unuspay-crypto-payments-for-woocommerce-settings',
 				'title'      => 'Settings',
 				'capability' => 'manage_woocommerce',
-				'parent'     => 'unuspay-woocommerce-payments',
+				'parent'     => 'unuspay-crypto-payments-for-woocommerce',
 				'path'       => '/unuspay/settings',
 				'nav_args'   => [
-					'parent'   => 'unuspay-woocommerce-payments',
+					'parent'   => 'unuspay-crypto-payments-for-woocommerce',
 					'order'  => 10
 				]
 			]

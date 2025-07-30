@@ -33,5 +33,5 @@ cd lint && composer install && cd ..
 Then run:
 
 ```
-php ./lint/vendor/bin/phpcs --standard=./lint/pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --ignore-annotations --extensions=php,html unuspay-woocommerce-payments.php includes
+php ./lint/vendor/bin/phpcs --standard=./lint/pbs-rules-set.xml --warning-severity=0 --report-source --report-full=phpcs-report.txt --ignore-annotations --extensions=php,html unuspay-crypto-payments-for-woocommerce.php includes
 ```

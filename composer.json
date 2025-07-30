@@ -1,5 +1,5 @@
 {
-    "name": "unuspay/unuspay-woocommerce-payments",
+    "name": "unuspay/unuspay-crypto-payments-for-woocommerce",
     "type": "project",
     "license": "MIT",
     "require": {

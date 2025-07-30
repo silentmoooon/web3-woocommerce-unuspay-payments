@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'unuspay/unuspay-woocommerce-payments',
+        'name' => 'unuspay/unuspay-crypto-payments-for-woocommerce',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => '5031622050a2e43479f6cfc308445a208997dd45',
@@ -10,7 +10,7 @@
         'dev' => true,
     ),
     'versions' => array(
-        'unuspay/unuspay-woocommerce-payments' => array(
+        'unuspay/unuspay-crypto-payments-for-woocommerce' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => '5031622050a2e43479f6cfc308445a208997dd45',

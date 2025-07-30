@@ -5,7 +5,7 @@ import SetupTask from './admin/SetupTask'
 
   hooks.addFilter(
       "woocommerce_admin_onboarding_task_list",
-      "unuspay-woocommerce-payments",
+      "unuspay-crypto-payments-for-woocommerce",
       (tasks) => {
           let completed = window.UNUSPAY_WC_SETUP.done == "1";
           const task = {
@@ -28,7 +28,7 @@ import SetupTask from './admin/SetupTask'
 
   hooks.addFilter(
       "woocommerce_admin_pages_list",
-      "unuspay-woocommerce-payments",
+      "unuspay-crypto-payments-for-woocommerce",
       (pages) => {
           pages.push({
               container: AdminSettingsPage,
@@ -37,7 +37,7 @@ import SetupTask from './admin/SetupTask'
               capability: "manage_woocommerce",
               wpOpenMenu: "toplevel_page_wc-admin-path--unuspay-settings",
               navArgs: {
-                  id: "unuspay-woocommerce-payments-settings",
+                  id: "unuspay-crypto-payments-for-woocommerce-settings",
               },
           });
          /* pages.push({
@@ -47,7 +47,7 @@ import SetupTask from './admin/SetupTask'
               capability: "manage_woocommerce",
               wpOpenMenu: "toplevel_page_wc-admin-path--unuspay-settings",
               navArgs: {
-                  id: "unuspay-woocommerce-payments-transactions",
+                  id: "unuspay-crypto-payments-for-woocommerce-transactions",
               },
           });*/
           return pages;
