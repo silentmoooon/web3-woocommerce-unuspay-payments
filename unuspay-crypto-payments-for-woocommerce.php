@@ -5,7 +5,7 @@
  * Description: unuspay Payments directly into your own wallet.
  * Author: unuspay
  * Author URI: https://unuspay.com
- * Text Domain: unuspay crypto payments
+ * Text Domain: unuspay-crypto-payments-for-woocommerce
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Domain Path: /languages
