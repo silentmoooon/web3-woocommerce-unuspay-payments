@@ -55,6 +55,7 @@ const displayCheckout = async () => {
         });
         let configuration = {
             accept: paymentInfo,
+            currency: response.currency,
             closed: () => {
                 window.location.hash = "";
                 window.location.reload(true);
