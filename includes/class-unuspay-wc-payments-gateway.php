@@ -125,7 +125,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
  
     public function getUnusPayOrder($order)
     {
-        $lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? sanitize_text_field($_SERVER['HTTP_ACCEPT_LANGUAGE']) : '';
+        $lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_ACCEPT_LANGUAGE'])) : '';
         $headers = array(
             'accept-language' => $lang,
             'Content-Type' => 'application/json; charset=utf-8',
