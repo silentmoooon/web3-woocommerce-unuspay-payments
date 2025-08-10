@@ -10,6 +10,7 @@
     ],
     "scripts": {
         "build": "rollup -c rollup.build.config.js",
+        "build:uat": "rollup -c rollup.build.config.uat.js",
         "release": "git push && node release.js",
         "update:version": "node update-version.js"
     },
