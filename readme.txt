@@ -1,6 +1,6 @@
 === UnusPay Crypto Payments ===
 Contributors: UnusPay
-Tags: web3, payments, woocommerce, depay, cryptocurrency
+Tags: web3, payments, woocommerce, cryptocurrency
 Requires at least: 6.0
 Tested up to: 10.0
 Requires PHP: 7.2
@@ -27,10 +27,10 @@ This plugin registers several public REST API endpoints under the `/wp-json/unus
 - `/wp-json/unuspay/wc/track`  
   Used by the user to submit payment results to UnusPay for tracking the payment status.
 
-- `/wp-json/unuspay/wc/validate`  
+- `/wp-json/unuspay/wc/release`  
   Used by the user to query the payment status from UnusPay to check whether the transaction has been verified.
 
-- `/wp-json/unuspay/wc/callback`  
+- `/wp-json/unuspay/wc/validate`  
   Called by UnusPay to send a notification after the transaction has been successfully verified.
 
 These endpoints are required for the payment workflow and are meant to be accessible from external clients and the UnusPay server. If needed, additional security mechanisms such as token validation can be implemented on the server side.
