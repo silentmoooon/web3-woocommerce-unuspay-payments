@@ -22,7 +22,8 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         $this->title = empty($title) ? 'UnusPay' : $title;
         $description = get_option('unuspay_wc_checkout_description');
         $this->description = empty($description) ? null : $description;
-        $this->blockchain = null;
+        $this->unuspay_wc_payment_key = get_option('unuspay_wc_payment_key');
+        add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
     }
 
     public function get_title()
@@ -52,12 +53,12 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         if ($post_response_json->code != 200) {
             $icon = '';
         }
-        $url = esc_url(plugin_dir_url(__FILE__) . 'images/logo.jpg');
+        $url = esc_url(plugins_url('assets/images/logo.jpg', dirname(__FILE__)));
         $icon = $icon . "<img title='Unuspay' class='wc-unuspay-blockchain-logo' src='" . $url . "'/>";
-            foreach ($post_response_json->data as $blockchain) {
-                $url = esc_url(plugin_dir_url(__FILE__) . 'images/blockchains/' . $blockchain . '.svg');
-                $icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
-            }
+        foreach ($post_response_json->data as $blockchain) {
+            $url = esc_url(plugins_url('assets/images/blockchains/' . $blockchain . '.svg', dirname(__FILE__)));
+            $icon = $icon . "<img title='Payments on " . ucfirst($blockchain) . "' class='wc-unuspay-blockchain-icon' src='" . $url . "'/>";
+        }
         }
         return $icon;
     }
@@ -72,20 +73,28 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
                 'label' => 'Enable gateway',
                 'default' => 'yes'
             ),
-            'title' => array(
+            'unuspay_wc_checkout_title' => array(
                 'title' => 'Title',
                 'type' => 'text',
                 'description' => 'This controls the title which the user sees during checkout.',
                 'default' => 'UnusPay',
                 'desc_tip' => true,
             ),
-            'description' => array(
-                'title' => 'Description',
-                'type' => 'textarea',
-                'description' => 'Payment method description that the customer will see on your checkout.',
+            'unuspay_wc_payment_key' => array(
+                'title' => 'Payment Key',
+                'type' => 'text',
+                'description' => 'To increase your request limit towards UnusPay APIs,
+                              please enter your Payment key.',
                 'default' => '',
                 'desc_tip' => true,
-            )
+            ),
+			'unuspay_wc_checkout_description' => array(
+				'title'       => 'Description',
+				'type'        => 'textarea',
+				'description' => 'Payment method description that the customer will see on your checkout.',
+				'default'     => '',
+				'desc_tip'    => true,
+			)
         );
     }
 
@@ -172,10 +181,10 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         return $post_response_json->data;
     }
 
-    public function admin_options()
+/*     public function admin_options()
     {
         wp_redirect('/wp-admin/admin.php?page=wc-admin&path=%2Funuspay%2Fsettings');
     }
-
+ */
     
 }

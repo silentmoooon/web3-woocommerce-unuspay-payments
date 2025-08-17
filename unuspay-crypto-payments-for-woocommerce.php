@@ -23,10 +23,8 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'UNUSPAY_WC_PLUGIN_FILE', __FILE__ );
 define( 'UNUSPAY_WC_ABSPATH', __DIR__ . '/' );
-define( 'UNUSPAY_MIN_WC_ADMIN_VERSION', '0.23.2' );
 define( 'UNUSPAY_CURRENT_VERSION', '0.0.2' );
 
-require_once UNUSPAY_WC_ABSPATH . '/vendor/autoload.php';
 
 function unuspay_run_migration() {
 	 global $wpdb;
@@ -85,21 +83,7 @@ function unuspay_activated() {
 
 	unuspay_run_migration();
 	
-	/*try {
-		wp_remote_post( 'https://unuspay.com/installs',
-			array(
-				'headers' => array( 'Content-Type' => 'application/json; charset=utf-8' ),
-				'body' => json_encode( [
-					'type' => 'woocommerce',
-					'host' => get_option( 'siteurl' ),
-				] ),
-				'method' => 'POST',
-				'data_format' => 'body'
-			)
-		);
-	} catch (Exception $e) {
-		error_log('Reporting install failed');
-	}*/
+	 
 }
 register_activation_hook( __FILE__, 'unuspay_activated' );
 
@@ -126,17 +110,4 @@ add_action( 'before_woocommerce_init', function() {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 	}
 });
-
-function unuspay_blocks_support() {
-	if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
-		add_action(
-			'woocommerce_blocks_payment_method_type_registration',
-			function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
-				
-				require_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-block.php';
-                					$payment_method_registry->register( new UnusPay_WC_Payments_Block() );
-			}
-		);
-	}
-}
-add_action( 'woocommerce_blocks_loaded', 'unuspay_blocks_support' );
+ 

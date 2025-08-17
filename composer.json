@@ -1,8 +1,0 @@
-{
-    "name": "unuspay/unuspay-crypto-payments-for-woocommerce",
-    "type": "project",
-    "license": "MIT",
-    "require": {
-        "phpseclib/phpseclib": "^3.0"
-    }
-}

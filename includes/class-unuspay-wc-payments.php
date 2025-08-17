@@ -15,14 +15,14 @@ class UnusPay_WC_Payments {
 		}
 
 		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-gateway.php';
-		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-settings.php';
-		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-admin.php';
+		//include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-settings.php';
+		//include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-admin.php';
 		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-rest.php';
 
-		self::setup_settings();
-		self::setup_admin();
+		//self::setup_settings();
+		//self::setup_admin();
 		self::setup_gateway();
-		self::setup_task();
+		//self::setup_task();
 		self::setup_checkout();
 		self::setup_rest_api();
 		//self::setup_denomination();
@@ -48,14 +48,14 @@ class UnusPay_WC_Payments {
 		self::$settings = new UnusPay_WC_Payments_Settings();
 	}
 
-	public static function setup_admin() {
+/* 	public static function setup_admin() {
 
 		if ( !is_admin() || !current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 		new UnusPay_WC_Payments_Admin( self::$settings );
 	}
-
+ */
 	public static function setup_gateway() {
 		 
 			add_filter( 'woocommerce_payment_gateways', [ 'UnusPay_WC_Payments', 'add_gateway' ] );
@@ -99,9 +99,9 @@ class UnusPay_WC_Payments {
 
 		wp_register_style( 'UNUSPAY_WC_STYLE', plugins_url( 'assets/css/unuspay.css', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION );
 		wp_enqueue_style( 'UNUSPAY_WC_STYLE' );
-		wp_register_script( 'UNUSPAY_WC_WIDGETS', plugins_url( 'dist/widgets.bundle.js', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+		wp_register_script( 'UNUSPAY_WC_WIDGETS', plugins_url( 'assets/js/widgets.bundle.js', UNUSPAY_WC_PLUGIN_FILE ), array(), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 		wp_enqueue_script( 'UNUSPAY_WC_WIDGETS' );
-		wp_register_script( 'UNUSPAY_WC_CHECKOUT', plugins_url( 'dist/checkout.js', UNUSPAY_WC_PLUGIN_FILE ), array( 'wp-api-request', 'jquery' ), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+		wp_register_script( 'UNUSPAY_WC_CHECKOUT', plugins_url( 'assets/js/checkout.js', UNUSPAY_WC_PLUGIN_FILE ), array( 'wp-api-request', 'jquery' ), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 		wp_enqueue_script( 'UNUSPAY_WC_CHECKOUT' );
 		/*wp_localize_script('UNUSPAY_WC_CHECKOUT', 'UNUSPAY_WC_CURRENCY', array(
 			'displayCurrency' => ( get_option('unuspay_wc_displayed_currency') ),
