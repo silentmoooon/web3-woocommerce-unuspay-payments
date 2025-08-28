@@ -2,7 +2,7 @@
 Contributors: UnusPay
 Tags: web3, payments, woocommerce, cryptocurrency
 Requires at least: 6.0
-Tested up to: 10.0
+Tested up to: 6.8.2
 Requires PHP: 7.2
 Stable tag: 1.0.1
 Requires Plugins: woocommerce
