@@ -103,10 +103,10 @@ class UnusPay_WC_Payments {
 		wp_enqueue_script( 'UNUSPAY_WC_WIDGETS' );
 		wp_register_script( 'UNUSPAY_WC_CHECKOUT', plugins_url( 'assets/js/checkout.js', UNUSPAY_WC_PLUGIN_FILE ), array( 'wp-api-request', 'jquery' ), UNUSPAY_CURRENT_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 		wp_enqueue_script( 'UNUSPAY_WC_CHECKOUT' );
-		/*wp_localize_script('UNUSPAY_WC_CHECKOUT', 'UNUSPAY_WC_CURRENCY', array(
-			'displayCurrency' => ( get_option('unuspay_wc_displayed_currency') ),
-			'storeCurrency' => ( get_option('woocommerce_currency') )
-		));*/
+		wp_localize_script('UNUSPAY_WC_WIDGETS', 'UNUSPAY', array(
+			'image_base_url' => (esc_url(plugins_url('assets/images', dirname(__FILE__))) )
+			
+		));
 	}
 
 	public static function setup_rest_api() {
