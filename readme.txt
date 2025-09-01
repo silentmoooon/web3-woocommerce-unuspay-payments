@@ -83,6 +83,21 @@ Below are the external endpoints used, along with explanations of what data is s
      - WalletConnect: https://walletconnect.com/privacy-policy/  
      - Ethereum: https://ethereum.org/en/privacy-policy/
 
+6. **UnusPay Token Logo API**  
+   - **Endpoint**: https://dapp.unuspay.com/images/${blockchain}/${address}/logo.png  
+   - **Purpose**: Retrieves a list of supported blockchains for a given payment.  
+   - **Data Sent**: blockchain,address
+   - **When**: Called when initiating a new crypto payment to show available token options.  
+   - **Note**: This API is included as a feature of our plugin to provide token logos dynamically during the payment process.
+      When users initiate a payment and select a token, the plugin fetches the token logo from this API and displays it in the interface.
+      Our payment system supports thousands of tokens across multiple blockchains.
+         It is not feasible to bundle all logos inside the plugin because:
+         The plugin size would become extremely large
+         Updating token logos would require frequent plugin releases
+         Scalability would be limited as new tokens appear
+   - **Terms of Service**: https://unuspay.com/terms-of-use/  
+   - **Privacy Policy**: https://unuspay.com/privacy-policy/
+
 ### 1. Worldcoin Username API
 This service is provided by Worldcoin (world.org) and is used to query usernames associated with wallet addresses, likely for displaying user-friendly identifiers in your plugin's widgets or transaction views.
 
