@@ -1,10 +1,10 @@
 === UnusPay Crypto Payments ===
-Contributors: UnusPay
+Contributors: unustech01
 Tags: web3, payments, woocommerce, cryptocurrency
 Requires at least: 6.0
-Tested up to: 6.8.2
+Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.1
+Stable tag: 1.0.0
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -13,9 +13,9 @@ Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and 
 
 == Source Code ==
 
-The plugin includes minified assets in the /dist folder.  
-Source files can be found in the /src directory or at:  
-https://github.com/unuspay/widgets
+The plugin includes minified assets in the /assets/js folder.  
+Source files can be found at:  
+[widgets](https://github.com/unuspay/widgets)
 
 == Public REST API Endpoints ==
 
@@ -82,6 +82,44 @@ Below are the external endpoints used, along with explanations of what data is s
      - MetaMask: https://consensys.net/privacy-policy/  
      - WalletConnect: https://walletconnect.com/privacy-policy/  
      - Ethereum: https://ethereum.org/en/privacy-policy/
+
+### 1. Worldcoin Username API
+This service is provided by Worldcoin (world.org) and is used to query usernames associated with wallet addresses, likely for displaying user-friendly identifiers in your plugin's widgets or transaction views.
+
+- Data sent: Wallet addresses (e.g., an array of addresses like [t] in the POST body).
+- When: Every time the plugin fetches username data, such as during widget loading or when processing a specific address.
+- Terms of Service: https://world.org/legal/user-terms-and-conditions
+- Privacy Policy: https://world.org/legal/privacy-notice
+
+### 2. Gnosis Safe Transaction Service API
+This service is provided by Gnosis (gnosis.io / safe.global) and is used to retrieve transaction history and details for multisig safes, such as all transactions for a safe or specific multisig transaction data.
+
+- Data sent: Safe addresses, transaction IDs, and related identifiers (e.g., via URL paths like /safes/{address}/all-transactions/ or /multisig-transactions/{tx_id}/).
+- When: When the plugin needs to display or process transaction data for a Gnosis Safe, such as in widget updates or on-demand queries.
+- Terms of Service: https://www.gnosis.io/legal/terms-conditions
+- Privacy Policy: https://www.gnosis.io/legal/privacy-policy
+
+### 3. UnusPay Transaction API
+This service is provided by UnusPay (unuspay.com), a decentralized crypto payment platform, and is used to fetch transaction details on the Worldchain network, possibly for verifying or displaying payment information.
+
+- Data sent: Transaction IDs (e.g., via URL paths like /transactions/worldchain/{transaction_id}).
+- When: When the plugin queries a specific transaction, such as during widget rendering or user-initiated actions.
+- Terms of Service: https://unuspay.com/terms-of-use (assumed based on site navigation; verify and update if the exact link differs).
+- Privacy Policy: https://unuspay.com/privacy-policy (assumed based on site navigation; verify and update if the exact link differs).
+
+Note: The UnusPay website mentions "Privacy Policy" and "Terms of Use" in its footer, but exact URLs weren't explicitly listed in public sources. I recommend browsing the site or contacting the service to confirm the links and ensure they point to the correct documents.
+
+### 4. Solana RPC API
+This service is provided by Solana (solana.com) and consists of public RPC endpoints for interacting with the Solana blockchain, such as querying blockchain data or submitting transactions.
+
+- Data sent: Blockchain-specific queries (e.g., endpoint URLs like https://api.mainnet-beta.solana.com for mainnet, or others for devnet/testnet/localnet).
+- When: Whenever the plugin interacts with the Solana network, such as during chain detection, transaction processing, or widget initialization.
+- Terms of Service: https://solana.com/tos
+- Privacy Policy: https://solana.com/privacy-policy
+
+### Additional Notes
+- The plugin only sends data necessary for the intended functionality (e.g., addresses, IDs) and does not share unrelated user data unless specified otherwise in the code.
+- No data is sent without user interaction or widget loading, and users should be aware that blockchain-related data is inherently public.
 
 == Simple Web3 Cryptocurrency Payments with UnusPay ==
 
