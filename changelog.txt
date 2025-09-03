@@ -1,4 +1,4 @@
-*** UnusPay Web3 Payments for WooCommerce Changelog ***
+*** UnusPay Crypto Payments Changelog ***
 
 2025-7-20 - version 1.0.0
 * Initial release
