@@ -160,3 +160,7 @@ All* standard tokens.
 
 * if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://unuspay.com/docs/payments/supported/tokens/).
 
+== Changelog ==
+
+= 1.0.0 - Sep 07, 2025 =
+* Initial release 🎉.

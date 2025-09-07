@@ -14,13 +14,18 @@ class UnusPay_WC_Payments {
 			return;
 		}
 
-		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-gateway.php';
-		include_once UNUSPAY_WC_ABSPATH . 'includes/class-unuspay-wc-payments-rest.php';
- 
+		include_once 'class-unuspay-wc-payments-gateway.php';
+		//include_once 'class-unuspay-wc-payments-settings.php';
+		//include_once 'class-unuspay-wc-payments-admin.php';
+		include_once 'class-unuspay-wc-payments-rest.php';
+
+		//self::setup_settings();
+		//self::setup_admin();
 		self::setup_gateway();
+		//self::setup_task();
 		self::setup_checkout();
 		self::setup_rest_api();
-	 
+		//self::setup_denomination();
 	}
 
 	private static $plugin_headers = null;
@@ -42,7 +47,15 @@ class UnusPay_WC_Payments {
 
 		self::$settings = new UnusPay_WC_Payments_Settings();
 	}
- 
+
+/* 	public static function setup_admin() {
+
+		if ( !is_admin() || !current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+		new UnusPay_WC_Payments_Admin( self::$settings );
+	}
+ */
 	public static function setup_gateway() {
 		 
 			add_filter( 'woocommerce_payment_gateways', [ 'UnusPay_WC_Payments', 'add_gateway' ] );
@@ -106,7 +119,21 @@ class UnusPay_WC_Payments {
 		$controller = new UnusPay_WC_Payments_Rest();
 		$controller->register_routes();
 	}
- 
+
+	/*public static function setup_denomination() {
+
+		if ( !empty( get_option( 'unuspay_wc_token_for_denomination' ) ) ) {
+			add_filter( 'woocommerce_currencies', [ 'UnusPay_WC_Payments', 'add_crypto_currency' ] );
+			add_filter( 'woocommerce_currency_symbol', [ 'UnusPay_WC_Payments', 'add_crypto_currency_symbol' ], 10, 2 );
+		}
+	}*/
+
+	/*public static function add_crypto_currency( $currencies ) {
+
+		$token = json_decode( get_option( 'unuspay_wc_token_for_denomination' ) );
+		$currencies[ $token->symbol ] = $token->name;
+		return $currencies;
+	}*/
 
 	public static function add_crypto_currency_symbol( $currency_symbol, $currency ) {
 

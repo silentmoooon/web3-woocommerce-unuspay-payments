@@ -107,12 +107,22 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
 
             $accept = $this->getUnusPayOrder($order);
 
-            $result = $wpdb->insert("{$wpdb->prefix}wc_unuspay_checkouts", array(
-                'id' => $accept->id,
-                'order_id' => $order_id,
-                'accept' => json_encode($accept),
-                'created_at' => current_time('mysql')
-            ));
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+            $result = $wpdb->insert(
+                $wpdb->prefix . 'wc_unuspay_checkouts',
+                array(
+                    'id'        => sanitize_text_field( $accept->id ),
+                    'order_id'  => absint( $order_id ),
+                    'accept'    => wp_json_encode( $accept ),
+                    'created_at'=> current_time( 'mysql' )
+                ),
+                array(
+                    '%s', // id
+                    '%d', // order_id
+                    '%s', // accept
+                    '%s'  // created_at
+                )
+            );
             if (false === $result) {
                 $error_message = $wpdb->last_error;
                 UnusPay_WC_Payments::log('Storing checkout failed: ' . $error_message);

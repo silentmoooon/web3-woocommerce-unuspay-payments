@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: unuspay crypto payments
+ * Plugin Name: UnusPay Crypto Payments
  * Plugin URI: https://unuspay.com/e-commerce
  * Description: unuspay Payments directly into your own wallet.
  * Author: unuspay
@@ -8,9 +8,10 @@
  * Text Domain: unuspay-crypto-payments-for-woocommerce
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Domain Path: /languages
  * Requires Plugins: woocommerce
  * WC requires at least: 6.2
- * WC tested up to: 9.8.5
+ * WC tested up to: 10.0.0
  * Requires at least: 6.0
  * Requires PHP: 7.2
  * Version: 1.0.0
@@ -22,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'UNUSPAY_WC_PLUGIN_FILE', __FILE__ );
 define( 'UNUSPAY_WC_ABSPATH', __DIR__ . '/' );
-define( 'UNUSPAY_CURRENT_VERSION', '0.0.2' );
+define( 'UNUSPAY_CURRENT_VERSION', '1.0.0' );
 
 
 function unuspay_run_migration() {
@@ -86,22 +87,12 @@ function unuspay_activated() {
 }
 register_activation_hook( __FILE__, 'unuspay_activated' );
 
-function unuspay_deactivated() {
-
-}
-register_deactivation_hook( __FILE__, 'unuspay_deactivated' );
-
 function unuspay_init() {
 
-	require_once UNUSPAY_WC_ABSPATH . '/includes/class-unuspay-wc-payments.php';
+	require_once 'includes/class-unuspay-wc-payments.php';
 	UnusPay_WC_Payments::init();
 }
 add_action( 'plugins_loaded', 'unuspay_init', 11 );
-
-function unuspay_tasks_init() {
-	
-}
-add_action( 'plugins_loaded', 'unuspay_tasks_init' );
 
 // HPOS compatible
 add_action( 'before_woocommerce_init', function() {

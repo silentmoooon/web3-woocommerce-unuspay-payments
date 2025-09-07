@@ -85,6 +85,13 @@ class UnusPay_WC_Payments_Rest {
 			$response = rest_ensure_response( $accept );
 		}
 
+	/* 	$response->header( 'X-Checkout', json_encode( [ 
+			'request_id' => $id,
+			'checkout_id' => $checkout_id,
+			'order_id' => $order_id,
+			'total' => $order->get_total(),
+			'currency' => $order->get_currency()
+		] ) ); */
 		return $response;
 	}
 
