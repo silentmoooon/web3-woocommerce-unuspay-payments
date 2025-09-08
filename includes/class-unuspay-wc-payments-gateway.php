@@ -18,14 +18,14 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         $this->supports = ['products'];
         $this->init_form_fields();
         $this->init_settings();
-        $title = get_option('unuspay_wc_checkout_title');
+        $title = $this->get_option('unuspay_wc_checkout_title');
         $this->title = empty($title) ? 'UnusPay' : $title;
-        $description = get_option('unuspay_wc_checkout_description');
+        $description = $this->get_option('unuspay_wc_checkout_description');
         $this->description = empty($description) ? null : $description;
-        $this->unuspay_wc_payment_key = get_option('unuspay_wc_payment_key');
+        $this->unuspay_wc_payment_key = $this->get_option('unuspay_wc_payment_key');
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
     }
-
+ 
     public function get_title()
     {
         return $this->title;
@@ -34,10 +34,10 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
     public function get_icon()
     {
         $icon = '';
-        if (empty(get_option('unuspay_wc_payment_key'))) {
+        if (empty($this->get_option('unuspay_wc_payment_key'))) {
             $icon = '';
         }  else {
-            $post_response = wp_remote_get("https://dapp.unuspay.com/api/payment/link/blockchains?linkId=" . get_option('unuspay_wc_payment_key'),
+            $post_response = wp_remote_get("https://dapp.unuspay.com/api/payment/link/blockchains?linkId=" . $this->get_option('unuspay_wc_payment_key'),
             array(
                  
                 'method' => 'GET'
@@ -128,14 +128,10 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
                 UnusPay_WC_Payments::log('Storing checkout failed: ' . $error_message);
                 throw new Exception('Storing checkout failed: ');
             }
-          /*   $redirect_url = "Location: " . '#wc-unuspay-checkout-' . $accept->id . '@' . time();
-            header($redirect_url);
-            die();
-            return rest_ensure_response('{}'); */
+
             return ([
                 'result' => 'success',
                 'redirect' => '#wc-unuspay-checkout-' . $accept->id . '@' . time()
-                // 'redirect'       => get_option('woocommerce_enable_signup_and_login_from_checkout') === 'yes' ? $order->get_checkout_payment_url() . '#wc-depay-checkout-' . $checkout_id . '@' . time() : '#wc-depay-checkout-' . $checkout_id . '@' . time()
             ]);
         } else {
             $order->payment_complete();
@@ -154,7 +150,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         $total = $order->get_total();
         $currency = $order->get_currency();
 
-        $payment_key = get_option('unuspay_wc_payment_key');
+        $payment_key = $this->get_option('unuspay_wc_payment_key');
         if (empty($payment_key)) {
             throw new Exception('No payment key found!');
         }

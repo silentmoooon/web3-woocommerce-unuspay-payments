@@ -4,7 +4,7 @@ Tags: web3, payments, woocommerce, cryptocurrency
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -161,6 +161,8 @@ All* standard tokens.
 * if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://unuspay.com/docs/payments/supported/tokens/).
 
 == Changelog ==
+= 1.0.1 - Sep 07, 2025 =
+* Bug fix: configuration changes were not being saved correctly.
 
 = 1.0.0 - Sep 07, 2025 =
 * Initial release 🎉.
