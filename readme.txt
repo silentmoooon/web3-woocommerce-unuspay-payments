@@ -1,6 +1,6 @@
 === UnusPay Crypto Payments ===
 Contributors: unustech01
-Tags: web3, payments, woocommerce, cryptocurrency
+Tags: crypto payment gateway, accept crypto, bitcoin, USDT, coinbase
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.2
@@ -9,160 +9,179 @@ Requires Plugins: woocommerce
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Accept Web3 payments, supporting various cryptocurrency tokens, blockchains and wallets, with the UnusPay Payments extension for WooCommerce.
 
-== Source Code ==
-
-The plugin includes minified assets in the /assets/js folder.  
-Source files can be found at:  
-[widgets](https://github.com/unuspay/widgets)
-
-== Public REST API Endpoints ==
-
-This plugin registers several public REST API endpoints under the `/wp-json/unuspay/wc/` namespace. These endpoints are intentionally exposed without authentication (`__return_true`) for integration with the UnusPay payment platform. They are safe for public use and designed for communication between the WooCommerce store and UnusPay.
-
-- `/wp-json/unuspay/wc/checkouts/{id}`  
-  Used by the user to create a UnusPay order and initiate the payment process.
-
-- `/wp-json/unuspay/wc/track`  
-  Used by the user to submit payment results to UnusPay for tracking the payment status.
-
-- `/wp-json/unuspay/wc/release`  
-  Used by the user to query the payment status from UnusPay to check whether the transaction has been verified.
-
-- `/wp-json/unuspay/wc/validate`  
-  Called by UnusPay to send a notification after the transaction has been successfully verified.
-
-These endpoints are required for the payment workflow and are meant to be accessible from external clients and the UnusPay server. If needed, additional security mechanisms such as token validation can be implemented on the server side.
-
-== External Services ==
-
-This plugin relies on external services provided by UnusPay to enable cryptocurrency payments.  
-Below are the external endpoints used, along with explanations of what data is sent, when, and why:
-
-1. **UnusPay Blockchain Info API**  
-   - **Endpoint**: https://dapp.unuspay.com/api/payment/link/blockchains  
-   - **Purpose**: Retrieves a list of supported blockchains for a given payment.  
-   - **Data Sent**: payment key
-   - **When**: Called when initiating a new crypto payment to show available blockchain options.  
-   - **Terms of Service**: https://unuspay.com/terms-of-use/  
-   - **Privacy Policy**: https://unuspay.com/privacy-policy/
-
-2. **UnusPay Order Creation API**  
-   - **Endpoint**: https://dapp.unuspay.com/api/payment/ecommerce/order  
-   - **Purpose**: Creates a crypto payment order on the UnusPay system.  
-   - **Data Sent**: website, lang, orderId,email, payment key, currency, amount, commerceType
-   - **When**: Called when a user confirms checkout with cryptocurrency as the selected payment method.  
-   - **Terms of Service**: https://unuspay.com/terms-of-use/  
-   - **Privacy Policy**: https://unuspay.com/privacy-policy/
-
-3. **UnusPay Payment API**  
-   - **Endpoint**: https://dapp.unuspay.com/api/payment/pay  
-   - **Purpose**: Initiates the payment process for the order.  
-   - **Data Sent**: payment informations , etc.Order ID, supported blockchains and tokens, amount  etc. 
-   - **When**: Called after order creation when payment is being initiated.  
-   - **Terms of Service**: https://unuspay.com/terms-of-use/  
-   - **Privacy Policy**: https://unuspay.com/privacy-policy/
-
-4. **UnusPay Payment Status API**  
-   - **Endpoint**: https://dapp.unuspay.com/api/payment/release  
-   - **Purpose**: Checks the status of a payment to confirm whether it was completed.  
-   - **Data Sent**: Order ID.  
-   - **When**: Called periodically after payment initiation to track payment confirmation.  
-   - **Terms of Service**: https://unuspay.com/terms-of-use/  
-   - **Privacy Policy**: https://unuspay.com/privacy-policy/
-
-5. **Web3 Wallet Interaction (e.g., MetaMask, WalletConnect, etc.)**  
-    - **Endpoint**: https://verify.walletconnect.com, https://api.mainnet-beta.solana.com, https://usernames.worldcoin.org/api/v1/query etc.
-   - **Purpose**: Allows users to authorize and sign blockchain transactions using their own Web3 wallet.  
-   - **Data Sent**: Public wallet address, transaction payload (amount, destination address, gas fees), and digital signature — initiated and approved by the user within their wallet app.  
-   - **When**: Triggered when a user clicks “Pay with Web3 Wallet” and confirms the transaction using their browser extension or mobile wallet.  
-   - **Note**: These actions are handled entirely by the user's wallet and blockchain network. This plugin does not collect or transmit private keys.  
-   - **Privacy Policies of common providers**:  
-     - MetaMask: https://consensys.net/privacy-policy/  
-     - WalletConnect: https://walletconnect.com/privacy-policy/  
-     - Ethereum: https://ethereum.org/en/privacy-policy/
-
-6. **UnusPay Token Logo API**  
-   - **Endpoint**: https://dapp.unuspay.com/images/${blockchain}/${address}/logo.png  
-   - **Purpose**: Retrieves a list of supported blockchains for a given payment.  
-   - **Data Sent**: blockchain,address
-   - **When**: Called when initiating a new crypto payment to show available token options.  
-   - **Note**: This API is included as a feature of our plugin to provide token logos dynamically during the payment process.
-      When users initiate a payment and select a token, the plugin fetches the token logo from this API and displays it in the interface.
-      Our payment system supports thousands of tokens across multiple blockchains.
-         It is not feasible to bundle all logos inside the plugin because:
-         The plugin size would become extremely large
-         Updating token logos would require frequent plugin releases
-         Scalability would be limited as new tokens appear
-   - **Terms of Service**: https://unuspay.com/terms-of-use/  
-   - **Privacy Policy**: https://unuspay.com/privacy-policy/
-
-### 1. Worldcoin Username API
-This service is provided by Worldcoin (world.org) and is used to query usernames associated with wallet addresses, likely for displaying user-friendly identifiers in your plugin's widgets or transaction views.
-
-- Data sent: Wallet addresses (e.g., an array of addresses like [t] in the POST body).
-- When: Every time the plugin fetches username data, such as during widget loading or when processing a specific address.
-- Terms of Service: https://world.org/legal/user-terms-and-conditions
-- Privacy Policy: https://world.org/legal/privacy-notice
-
-### 2. Gnosis Safe Transaction Service API
-This service is provided by Gnosis (gnosis.io / safe.global) and is used to retrieve transaction history and details for multisig safes, such as all transactions for a safe or specific multisig transaction data.
-
-- Data sent: Safe addresses, transaction IDs, and related identifiers (e.g., via URL paths like /safes/{address}/all-transactions/ or /multisig-transactions/{tx_id}/).
-- When: When the plugin needs to display or process transaction data for a Gnosis Safe, such as in widget updates or on-demand queries.
-- Terms of Service: https://www.gnosis.io/legal/terms-conditions
-- Privacy Policy: https://www.gnosis.io/legal/privacy-policy
-
-### 3. UnusPay Transaction API
-This service is provided by UnusPay (unuspay.com), a decentralized crypto payment platform, and is used to fetch transaction details on the Worldchain network, possibly for verifying or displaying payment information.
-
-- Data sent: Transaction IDs (e.g., via URL paths like /transactions/worldchain/{transaction_id}).
-- When: When the plugin queries a specific transaction, such as during widget rendering or user-initiated actions.
-- Terms of Service: https://unuspay.com/terms-of-use (assumed based on site navigation; verify and update if the exact link differs).
-- Privacy Policy: https://unuspay.com/privacy-policy (assumed based on site navigation; verify and update if the exact link differs).
-
-Note: The UnusPay website mentions "Privacy Policy" and "Terms of Use" in its footer, but exact URLs weren't explicitly listed in public sources. I recommend browsing the site or contacting the service to confirm the links and ensure they point to the correct documents.
-
-### 4. Solana RPC API
-This service is provided by Solana (solana.com) and consists of public RPC endpoints for interacting with the Solana blockchain, such as querying blockchain data or submitting transactions.
-
-- Data sent: Blockchain-specific queries (e.g., endpoint URLs like https://api.mainnet-beta.solana.com for mainnet, or others for devnet/testnet/localnet).
-- When: Whenever the plugin interacts with the Solana network, such as during chain detection, transaction processing, or widget initialization.
-- Terms of Service: https://solana.com/tos
-- Privacy Policy: https://solana.com/privacy-policy
-
-### Additional Notes
-- The plugin only sends data necessary for the intended functionality (e.g., addresses, IDs) and does not share unrelated user data unless specified otherwise in the code.
-- No data is sent without user interaction or widget loading, and users should be aware that blockchain-related data is inherently public.
-
-== Simple Web3 Cryptocurrency Payments with UnusPay ==
+= THE #1 CRYPTO PAYMENT SOLUTION FOR WOOCOMMERCE — TRUSTED BY 3,000+ BUSINESSES WORLDWIDE, NOW POWERED BY AI. =
 
 [youtube https://www.youtube.com/watch?v=o3ANPF-eXZ0]
 
 
-== Supported Blockchains ==
 
-* Ethereum
-* BNB Smart Chain
-* Polygon
-* Solana
-* Fantom
-* Gnosis
-* Avalanche
-* Arbitrum
-* Optimism
-* Base
+Crypto Payment Gateway for WooCommerce. Accept 1000+ cryptos on 10+ blockchains, including BTC, ETH, SOL, and Meme coins Doge or Pepe, with instant token swaps.
 
-== Supported Tokens ==
+== Description ==
 
-All* standard tokens.
+UnusPay is a decentralized cryptocurrency payment gateway for WooCommerce that lets you accept crypto payments instantly, securely, and directly to your wallet.
+It supports Bitcoin, Stablecoins, and Meme coins, with automatic on-chain token conversion and modular payment customization through the new iPayment system.
+Whether you’re running E-commerce, NFT marketplaces, SaaS subscriptions, or donation sites, UnusPay delivers a seamless Web3 payment experience with no intermediaries and instant settlement.
+Built for global merchants who want flexibility, control, and scalability in crypto commerce.
 
-* if the token standard is strictly adhered to and the token is convertible on a supported decentralized exchange. Check UnusPay’s documentation for further details about [what tokens are supported](https://unuspay.com/docs/payments/supported/tokens/).
 
-== Changelog ==
-= 1.0.1 - Sep 07, 2025 =
-* Bug fix: configuration changes were not being saved correctly.
+### 🌟 Next-Generation Payment Solution
+Accept any cryptocurrency — even Meme coins like Doge or Pepe — and UnusPay converts them instantly into valuable assets such as BTC, ETH, USDT, USDC and 1000+ Cryptos across 10+ blockchains.
+All conversions are handled on-chain through audited smart contracts.
+No custody. No redirect. No waiting.
+🔁 Transform volatility into value — secure, flexible, and automatic.
 
-= 1.0.0 - Sep 07, 2025 =
-* Initial release 🎉.
+
+= 💰 Supported Cryptocurrencies =
+Popular Coins
+- Bitcoin (BTC)
+- Ethereum (ETH)
+- Solana (SOL)
+- Litecoin (LTC)
+- Ripple (XRP)
+- Bitcoin Cash (BCH)
+- Dogecoin (DOGE)
+- Cardano (ADA)
+
+Stable Coins
+- USD Coin (USDC)
+- Tether (USDT ERC20)
+- Tether (USDT TRC20)
+- DAI (DAI)
+- TrueUSD (TUSD)
+- Pax Dollar (USDP)
+- Binance USD (BUSD)
+
+Other Coins & Tokens
+- Avalanche (AVAX)
+- TRON (TRX)
+- Chainlink (LINK)
+- Pepe (PEPE)
+- Shiba Inu (SHIB)
+- Decentraland (MANA)
+- Axie Infinity (AXS)
+- Monero (XMR)
+
+Merchants can accept any token and choose which coin to receive — UnusPay handles conversion in real time.
+
+
+= 🚀 Supported Blockchains =
+UnusPay operates across 10+ blockchains, enabling low-cost, fast, and global transactions:
+- Ethereum
+- BNB Smart Chain
+- Polygon
+- Solana
+- Gnosis
+- Arbitrum
+- Optimism
+- Avalanche
+- Base
+- World Chain
+- Other customized blockchains
+All payments are processed on-chain via smart contract, verified transparently, and completed instantly.
+
+
+= 👜 Supported Wallets =
+UnusPay supports over 100+ crypto wallets through WalletConnect and browser integrations. Popular wallets include:
+- MetaMask
+- Trust Wallet
+- Coinbase Wallet
+- Phantom, Ledger
+- Safe (Gnosis Safe)
+- Crypto.com
+- OKX
+- 1inch.
+- More available wallets
+Payments are peer-to-peer, non-custodial, and directly settled into your wallet — no intermediaries, no redirects, no delays.
+💰 You always own your funds.
+
+
+### 🗝️ Core Function Modules
+- On-Chain Payment Engine
+- Processes every transaction directly on-chain for maximum security and instant settlement.
+- Automatic Token Conversion
+- Convert any token into BTC, ETH, or Stablecoins at transaction time — no manual swaps required.
+- Crypto Invoicing System
+- Create and share crypto invoices for direct wallet payments.
+- [Merchant Dashboard]: Monitor payments, conversions, and wallet balances through a unified control panel.
+- [Analytics & Reporting]:Access transparent payment histories, analytics, and token usage insights.
+- [Multi-Wallet Compatibility]: Support desktop and mobile crypto wallets for frictionless checkout.
+- [iPayment]: – Modular Payment Builder. Customize your crypto payment flow like Lego — combine modules, define settlement logic, and generate branded payment links.
+
+
+= License & Partnership (Compliance & Trust) =
+- 🛡️ Regulatory Compliance
+UnusPay holds a valid U.S. MSB (Money Services Business) license and is applying for a European EMI (Electronic Money Institution) license.
+- 🤝 Official Partnerships
+UnusPay is an official TON blockchain partner, operating TONFinder — the Web3 business directory connecting users to verified merchants.
+All operations are non-custodial, audited, and fully transparent, ensuring regulatory readiness for every merchant.
+
+= 🌟 Supported Industries & Use Cases =
+- **[E-commerce](https://unuspay.com/e-commerce/)**： Accept crypto at checkout and grow global sales for your e-commerce store，increase 35% of repeated users.
+- **[Creator Economy](https://unuspay.com/creator-economy/)**： — Get paid directly in crypto for digital goods or services via customizable payment link.
+- **[SaaS & Web Services](https://unuspay.com/saas-and-web-services/)**： Enable recurring stablecoin payments. Power any subscription or billing model.
+- **[Marketplace & Platforms](https://unuspay.com/marketplace-and-platforms/)**： — Manage multi-vendor crypto settlements securely, onboard service providers, manage payments, send payouts, increase retention and scale their operations globally.
+- **[Gaming & NFTs](https://unuspay.com/gaming-nft%ef%bc%8cdigital-goods-services/)**： — Power in-game purchases, NFT trades, and digital asset transfers.
+- [For Charity & NGOs](https://unuspay.com/for-charity%ef%bc%8cngo-and-individuals/)： — Accept borderless crypto donations directly to your wallet.
+- **[iPayment (Custom Checkout)](https://unuspay.com/ipayment/)**： Create modular payment links for any use case. Deliver an optimized checkout experience and boost revenue by up to 30% with prebuilt, lego-like payment modules.
+- **[PayinN (interest-free installments)](https://unuspay.com/payinn/)**： Let customers split crypto payments over weeks or months—no late fees, no hassle. Automatically enroll at checkout and boost total orders by up to 20%.
+- For Individuals — Receive personal crypto payments via a link or on a website.
+- For Payroll Teams — Pay your team in crypto with one click—secure, automated, and tax-efficient.
+- For Travel & Hospitality — Let guests pay with Bitcoin, USDT, or any crypto asset.
+UnusPay adapts to every business — from freelancers to global platforms.
+
+
+= Installation / Setup Flow =
+1. Install & Activate — Add UnusPay to WooCommerce.
+2. Connect Wallet — Use MetaMask, Trust, or WalletConnect.
+3. Select Tokens — Define accepted and settlement coins.
+4. Copy&Paste payment keys in your WooCommerce settings.
+4. Start Accepting Payments — Crypto payments settle instantly to your wallet.
+
+
+Start accepting crypto payments with UnusPay — the most flexible, modular, and secure crypto payment gateway for WooCommerce.
+Accept 1000+ cryptocurrencies, customize your checkout with iPayment, and settle funds instantly to your wallet.
+Build your Web3 business today. 
+
+
+= Support =
+Need help or technical guidance?
+📩 Email: support@unuspay.com
+Demo store: https://unus.fun
+
+
+
+== Frequently Asked Questions ==
+
+***What makes UnusPay unique?***
+
+It’s a non-custodial crypto payment gateway that converts any token — even Meme coins — into stable value instantly.
+
+***What are the main benefits for merchants?***
+
+Instant payments, 1000+ crypto options, modular checkout customization, and no chargebacks.
+
+***Does it support fiat conversion?***
+
+Yes. Through our platform or partners, you can convert crypto into EUR, USD, HKD, or NGN seamlessly.
+
+***Is UnusPay secure?***
+
+100%. All transactions are executed on-chain via audited smart contracts. No custody, no frozen funds.
+
+***What are the fees?***
+Flat 1% transaction fee, with no setup or subscription charges.
+
+***What industries can use UnusPay?***
+E-commerce, gaming, SaaS, NFTs, charity, payroll, and hospitality and more.
+
+***Can customers use any wallet?***
+
+Yes. Supports 100+ wallets via WalletConnect and browser integrations.
+
+
+
+
+
+
