@@ -23,7 +23,7 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
         $description = $this->get_option('unuspay_wc_checkout_description');
         $this->description = empty($description) ? null : $description;
         $this->unuspay_wc_payment_key = $this->get_option('unuspay_wc_payment_key');
-        add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+        add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ));
     }
  
     public function get_title()
@@ -97,7 +97,64 @@ class UnusPay_WC_Payments_Gateway extends WC_Payment_Gateway
 			)
         );
     }
+public function process_admin_options() {
 
+    
+        if ( get_transient( 'unuspay_gateway_notified' ) ) {
+            return;
+        }
+        set_transient( 'unuspay_gateway_notified', true, 3 );
+
+		parent::process_admin_options();
+
+		$api_key = isset( $_POST['woocommerce_unuspay_wc_payments_unuspay_wc_payment_key'] ) ? sanitize_text_field( $_POST['woocommerce_unuspay_wc_payments_unuspay_wc_payment_key'] ) : '';
+
+ 
+    // 如果为空，直接阻止保存
+    if (empty($api_key)) {
+        WC_Admin_Settings::add_error('[Unuspay] Payment Key cannot be empty.');
+        return false; // 返回旧值，不保存新值
+    }
+    $headers = array(
+            'Content-Type' => 'application/json; charset=utf-8'
+        );
+     $website = get_option("siteurl");
+    $endpoint = 'https://dapp.unuspay.com/api/plugin/collect';
+    $response = wp_remote_post( $endpoint,
+                array(
+                    'headers' => $headers,
+                    'body' => json_encode([
+                        'website' => $website,
+                        'paymentKey' => $api_key,
+                        'platform' => 'woo'
+                    ]),
+                    'method' => 'POST',
+                    'data_format' => 'body'
+                )
+            );
+                
+
+    if (is_wp_error($response)) {
+        WC_Admin_Settings::add_error('[Unuspay] Failed to connect to the verification server.');
+        return false;
+    }
+
+ 
+    $rspBody = json_decode(wp_remote_retrieve_body($response));
+    if ($rspBody->code == 404) {
+
+        WC_Admin_Settings::add_error('[Unuspay]  Invalid Payment Key. Please check and try again.');
+        return false;
+    }
+    if ($rspBody->code != 200) {
+
+        WC_Admin_Settings::add_error('[Unuspay]  Failed to connect to the verification server.');
+        return false;
+    }
+
+    // 校验通过，允许保存
+    return true;
+}
     public function process_payment($order_id)
     {
         global $wpdb;
