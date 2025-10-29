@@ -105,7 +105,7 @@ public function process_admin_options() {
         }
         set_transient( 'unuspay_gateway_notified', true, 3 );
 
-		parent::process_admin_options();
+		
 
 		$api_key = isset( $_POST['woocommerce_unuspay_wc_payments_unuspay_wc_payment_key'] ) ? sanitize_text_field( $_POST['woocommerce_unuspay_wc_payments_unuspay_wc_payment_key'] ) : '';
 
@@ -151,7 +151,7 @@ public function process_admin_options() {
         WC_Admin_Settings::add_error('[Unuspay]  Failed to connect to the verification server.');
         return false;
     }
-
+    parent::process_admin_options();
     // 校验通过，允许保存
     return true;
 }
